@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/logger-test.dir/test.cpp.o  -o logger-test -Wl,-rpath,/home/hzarkov/Desktop/TU-Thesis/src/build/flash ../liblogger.so 

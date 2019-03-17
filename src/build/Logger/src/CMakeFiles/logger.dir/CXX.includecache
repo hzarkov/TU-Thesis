@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../Logger/src/../include/Logger.hpp
+string
+-
+iostream
+-
+sstream
+-
+
+/home/hzarkov/Desktop/TU-Thesis/src/Logger/src/Logger.cpp
+Logger.hpp
+/home/hzarkov/Desktop/TU-Thesis/src/Logger/src/Logger.hpp
+ctime
+-
+
