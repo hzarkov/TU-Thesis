@@ -1,4 +1,0 @@
-/home/hzarkov/Desktop/TU-Thesis/src/build/Logger/output/lib/liblogger.so
-/home/hzarkov/Desktop/TU-Thesis/src/build/Logger/output/bin/logger-test
-/home/hzarkov/Desktop/TU-Thesis/src/build/flash/lib/liblogger.so
-/home/hzarkov/Desktop/TU-Thesis/src/build/flash/bin/logger-test
