@@ -7,7 +7,7 @@ IP::IP(std::string value)
 
 void IP::set(std::string value)
 {
-    //Add check for the ip value;
+    //Add check for the ip value; include 192.168.0.1/32
     this->ip = value;
 }
 

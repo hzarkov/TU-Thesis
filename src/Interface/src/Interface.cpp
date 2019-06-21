@@ -27,6 +27,11 @@ Interface::Interface(std::string interface_name)
 {
 }
 
+std::string Interface::getName()
+{
+    return this->interface_name;
+}
+
 void Interface::enable()
 {
     if( System::call("ifconfig " + this->interface_name + " up") )

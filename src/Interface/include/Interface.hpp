@@ -28,6 +28,8 @@ private:
     inline int registerCallback(callbackList &list, callback &cb);
 public:
     Interface(std::string interface_name);
+    std::string getName();
+
     void enable();
     void disable();
     
