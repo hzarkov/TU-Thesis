@@ -1,0 +1,81 @@
+.TH dhcpclient 8 "04 Nov 2007" "snap_20071104" "A DHCP client"
+.\" ********************************************************************
+.SH NAME
+dhcpclient \- A DHCP client for linux 2.6, using modern kernel features
+.\" ********************************************************************
+.SH SYNOPSIS
+.B dhcpclient
+.RB [ -T ]
+.RB [ -G ]
+.RB [ -c
+.IR path ]
+.RB [ -h
+.IR hostname ]
+.RB [ -v ]
+.RB [ -a
+.IR arpcount ]
+.RB [ -A
+.IR arpcount ]
+.IR interface
+.\" ********************************************************************
+.SH DESCRIPTION
+.B dhcpclient
+is a highly customizable, RFC2131 compliant DHCP client that can act on
+link state messages.
+.\" ********************************************************************
+.SH OPTIONS
+.TP
+.B \-T
+Do not configure interface/route
+.TP
+.B \-G
+Do not configure route
+.TP
+.B \-c
+Path to helper script
+.TP
+.B \-h
+Hostname to report
+.TP
+.B \-a
+Maximum number of arp requests to send. Each failed request takes 0,5
+seconds. The default is 2, use 0 to disable.
+.TP
+.B \-A
+Maximum number of arp requests to verify default gateway after an OPER_UP
+transition. Each failed request takes 0,5 seconds. The default is 3, use 0
+to disable and immediatly reacquire lease.
+.TP
+.B \-v
+Display version and exit
+.\" ********************************************************************
+.SH TODO
+Add an option to support pre 2.6 kernels via a configurable polling
+interval.
+.P
+Allow the callback script to change the statemachine.
+.P
+Support for other OS
+.\" ********************************************************************
+.SH AUTHOR
+This software and its manpage are Copyright 2006, 2007 by Stefan Rompf
+(sux at loplof de).
+Information on the current version and a support mailinglist can be
+found at
+.B  http://www.flamewarmaster.de/software/dhcpclient/
+.PP
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU General Public License, Version 2 any later
+version published by the Free Software Foundation.
+.\" ********************************************************************
+.SH FILES
+.TP
+.I /usr/local/sbin/dhcpclient-script
+An optional script that allows additional actions inside the statemachine.
+.\" ********************************************************************
+.SH SEE ALSO
+.BR http://www.flamewarmaster.de/software/dhcpclient/,
+.BR ip (8),
+.BR ifconfig (8),
+.BR route (1),
+

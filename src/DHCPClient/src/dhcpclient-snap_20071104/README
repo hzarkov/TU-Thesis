@@ -1,0 +1,69 @@
+
+                                  dhcpclient
+
+   A DHCP client for linux 2.6, using modern kernel features, (c) 2006,
+   2007 Stefan Rompf.
+
+Motivation
+
+   Using a notebook, I'm often traveling between different networks.
+   After replugging, I always needed to issue a ifdown/ifup sequence
+   because the DHCP client did not realize the temporary disconnection.
+   This is an unneeded limitation because since 2.6, the kernel notifies
+   userspace of these disconnection/reconnection events. Actually is was
+   me who implemented this feature.
+
+   Beginning with 2.6.17, the linux kernel will allow userspace to
+   influence this signalling, so that for example a wpa supplicant can
+   tell the dhcpclient that an association has finished and the client
+   should try to get an IP address. wpa_supplicant supports this starting
+   with version 0.5.3.
+
+
+   Of course, you need software that supports this feature. Unfortunately,
+   most existing DHCP clients implemented their statemachine using
+   siglongjmp() or one huge function, so there was no easy way to extend
+   them. So I wrote a new one.
+
+Features
+
+     * RFC2131 compatible DHCP client, tested with ISC dhcpd directly and
+       via a Cisco IOS relay agent, Cisco IOS DHCP server and dnsmasq.
+     * uses netlink for interface configuration
+     * does act on link state messages
+     * calls a script on every state change to allow updating resolv.conf
+       etc
+     * small, compiles with [1]uclibc
+     * Follows RFC4436 to speed up reconnects
+
+
+Status
+
+   Currently, this is alpha software. It shouldn't be used in production
+   environment, but I'm looking forward for people who like to test it in
+   different environments and for (reasonable ;-) feature suggestions!
+
+Todo
+
+   [BUG] dhcpclient fails to notice lease expiry when laptop wakes up from
+       suspend and card does not send carrier down/up events via netlink.
+   [FEATURE] Restore default gateway on lease expiry when invoked without -G
+       and the default gateway was on another interface.
+   [WISH] Request additional options via command line arguments.
+   [WISH] Pass all dhcp options to script (according to type).
+   [FEATURE] Pass -G (or all) command line options to script (it is currently
+       not possible for the script to find out whether to modifiy resolv.conf
+       or not regarding command line arguments.
+
+Support
+
+   The webpage is at [2]http://www.flamewarmaster.de/software/dhcpclient/
+
+   There is a mailing list available on
+   [3]http://www.flamewarmaster.de/mailman/listinfo/dhcpclient/
+
+References
+
+   1. http://www.uclibc.org/
+   2. http://www.flamewarmaster.de/software/dhcpclient/
+   3. http://www.flamewarmaster.de/mailman/listinfo/dhcpclient/

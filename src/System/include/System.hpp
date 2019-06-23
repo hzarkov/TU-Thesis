@@ -2,12 +2,10 @@
 #define SYSTEM_HPP
 #include<string>
 
-class System
+namespace System
 {
-private:
-
-public:
-    static int call(std::string command);
+    int call(std::string command);
+    std::string exec(std::string command);
 };
 
 #endif

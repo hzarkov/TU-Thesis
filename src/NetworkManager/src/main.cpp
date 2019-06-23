@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
     network_manager->start();
 
     std::this_thread::sleep_for (std::chrono::seconds(1));
-    INIFileConfigurator ini_file_configurator(network_manager, "configuration.ini");
+    INIFileConfigurator ini_file_configurator(network_manager, "../config/configuration.ini");
     ini_file_configurator.configure();
 
     // Wait for stop signal (SIGINT, SIGTERM).

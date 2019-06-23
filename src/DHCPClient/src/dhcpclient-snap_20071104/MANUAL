@@ -1,0 +1,56 @@
+Installation instructions
+=========================
+
+Requirements:
+
+-Linux kernel 2.6.x
+-GNU make
+-gcc, tested with 3.3.5 or higher
+-makedepend
+
+
+Compilation:
+
+Edit Makefile if you want to change the installation location (default:
+/usr/local). Then type make in the base directory. This will create a .depend
+file and compile the executable.  
+
+
+Installation:
+
+Type "make install", then modify /usr/local/sbin/dhcpclient-script.sample
+and move it to /usr/local/sbin/dhcpclient-script
+
+
+Running:
+
+Bring up the interface without assigning an address by typing
+"ifconfig <interfacename> up".
+
+Start /usr/local/sbin/dhcpclient <interfacename>. If you run the executable
+without any argument, it will print the options available. Most interesting
+might be -c that takes the path to a script that will be executed on every
+state change and can be used f.e. to change resolv.conf. -c defaults to
+/usr/local/sbin/dhcpclient-script.
+
+
+Suse 9.3:
+
+With some script magic, dhcpclient can be setup as the default dhcp client
+for Suse 9.3:
+-Write a short script that execs dhcpclient for a specific interface and
+ with options of your choice
+-enter the string "DHCLIENT_BIN=<path to your script>" into
+ /etc/sysconfig.d/network/ifcfg-<interface>
+
+The provided client sample script can take care of updating resolv.conf by
+running /sbin/modify_resolvconf.
+
+
+Troubleshooting:
+
+If the client doesn't refresh/change the IP adress when moving to a new
+network, check if your network card supports link state notification. "ip
+monitor" should print events whenever you plug or unplug the cable. If it
+doesn't, your network card driver does not support the feature.
+

@@ -1,0 +1,102 @@
+snap_20071104
+=============
+-don't require asm/unaligned.h anymore
+-fixed some netlink parsing bugs spotted by Thomas Graf
+-handle providers sending a default gateway outside local subnet
+-documentation and script updates by Jörg Mayer
+
+snap_20061009
+=============
+-signedness fixes (thanks to Jörg Mayer)
+-fix struct timeval overflow, this also enables handling
+ of infinite lease time
+-close pid-fd when starting script, use correct macro
+ for fcntl()-argument
+-add syslog support (only enabled by adding -DUSE_SYSLOG to
+ Makefile, as this feature increases working set by >200k
+ with glibc)
+-added DESTDIR support and .spec-File (thanks to Jörg Mayer) 
+
+snap_20060328
+=============
+-add the relevant RFCs as comments to the options
+ (thanks to Jörg Mayer)
+-fix backoff during RENEWING/REBINDING
+-default T2 is .875*LEASE, not .85. By the way avoid floating
+ point ops in T1/T2 calculation
+-set and verify UDP checksum (thanks to Jörg Mayer, with
+ changes) 
+-send DHCPCLIENT_VERSION as DHCP_VERSION to script 
+-script updates (thanks to Jörg Mayer)
+-support for DHCP_OPTION_OVERLOAD (thanks to Jörg Mayer,
+ with changes)
+-MANUAL update (thanks to Jörg Mayer)
+-write pidfile, ensuring that daemon is started only once
+ per interface
+-make sure that the script is also called when the interface
+ is put admin down or removed.
+
+snap_20060309
+=============
+-script updates (thanks to Jörg Mayer)
+-configure default gateway only when it is really sent
+-send DHCP_OPTION_OPTIONREQ, DHCP_OPTION_LEASE and
+ BOOTP_OPTION_HOSTNAME only when allowed by RFC2131
+-send list of requested parameters (DHCP_OPTION_OPTIONREQ)
+-environment for current config sent to script is prefixed
+ with DHCP_CURRENT_ instead of DHCP_
+-send ARP probe to default gateway as unicast when possible
+
+snap_20060301
+=============
+-DHCP_OPTION_SERVER overwrote BOOTP_OPTION_NETMASK, leading
+ to funny but wrong netmasks when server sent both options,
+ netmask first
+-add offered config and, when going to state BOUND, previous
+ config to script environment
+
+snap_20060227
+=============
+-set T1 as timeout after arp checking the default gateway
+
+snap_20060226
+=============
+-After a oper down/up transition, try to verify the default
+ gateway via ARP requests before falling back to INIT_REBOOT.
+ Number of queries can be configured with -A, default is 3
+ (suggested by Simon Barber)
+-Man page fixes (thanks to Jörg Mayer) 
+
+snap_20060223
+=============
+-make number of ARP queries (-a) configurable.
+ (Thanks to Jörg Mayer)
+-fix (non-critical) off-by-one bug in message parsing
+-check hostname and domainname sent from DHCP server to script
+ for validity
+-added sample dhcpclient-script (thanks to Jörg Mayer,
+ Maurice Massar)
+-Many Makefile updates (thanks to Jörg Mayer) 
+-Set IP address and default gateway only if configuration
+ offered by server changed to improve interoperability
+ with f.e. VPN software that changes routes
+-SIGHUP goes to INIT_REBOOT. REBIND is not agressive enough
+ if a user really wants to verify the configuration
+
+snap_20060219
+=============
+-man page (Thanks to Jörg Mayer)
+-decline requested address if it is in use, detected by ARP
+ query. Can be disabled with -a
+
+snap_20060217_2
+===============
+-check return code when setting sockets to close on exec
+-fixup includes for ntohs() and friends
+ (Thanks to Paul Collins, Stefan Schmidt)
+-don't rely on include provided inline inet_mask_len() because
+ it doesn't compile on some platforms
+
+snap_20060217
+=============
+-Initial public release

@@ -54,10 +54,10 @@ void INIFileConfigurator::configure()
                
                 econtroller->setStatic(ip, netmask, gw, dns_servers);
             }
-            /*else // dhcp if IP is not set
+            else // dhcp if IP is not set
             {
                 econtroller->useDHCP();
-            }*/
+            }
         }
         else
         {
