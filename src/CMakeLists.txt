@@ -1,5 +1,5 @@
-add_library(ini-reader INTERFACE)
-target_include_directories(ini-reader INTERFACE inih)
+add_library(ini_reader INTERFACE)
+target_include_directories(ini_reader INTERFACE inih)
 set(COMPONENTS 
         Logger 
         System 

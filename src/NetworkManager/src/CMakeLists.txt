@@ -1,5 +1,20 @@
-add_executable(network-manager main.cpp NetworkManager.cpp EthernetController.cpp INIFileConfigurator.cpp FileConfigurator.cpp Configurator.cpp)
-target_link_libraries(network-manager PRIVATE interface route logger stdc++fs ini-reader dhcp_client dhcp_server dnsmasq_controller)
+add_library(network_controller SHARED NetworkManager.cpp EthernetController.cpp)
+target_link_libraries(network_controller PUBLIC interface route logger stdc++fs ini_reader dhcp_client dhcp_server dnsmasq_controller)
+target_include_directories(network_controller PUBLIC ../include/)
+target_compile_options(network_controller PRIVATE -fPIC)
+
+add_library(nm_configurator SHARED Configurator.cpp)
+target_link_libraries(nm_configurator PUBLIC network_controller )
+target_include_directories(nm_configurator PUBLIC ../include/)
+
+add_library(ini_nm_configurator SHARED INIFileConfigurator.cpp FileConfigurator.cpp)
+target_link_libraries(ini_nm_configurator PUBLIC ini_reader nm_configurator)
+target_include_directories(ini_nm_configurator PUBLIC ../include/)
+
+add_executable(network-manager main.cpp)
+target_link_libraries(network-manager PRIVATE ini_reader network_controller ini_nm_configurator dloader nm_configurator)
 target_include_directories(network-manager PRIVATE ../include/)
+
+install(TARGETS nm_configurator network_controller ini_nm_configurator DESTINATION ${PROJECT_BINARY_DIR}/output/lib/)
 install(TARGETS network-manager DESTINATION ${PROJECT_BINARY_DIR}/output/bin/)
-install(FILES configuration.ini DESTINATION ${PROJECT_BINARY_DIR}/output/config/)
+install(FILES nmPluginConfiguration.ini configuration.ini DESTINATION ${PROJECT_BINARY_DIR}/output/config/)

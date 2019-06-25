@@ -34,9 +34,17 @@ void INIFileConfigurator::configure()
         }
         else if("ethernet" == interface_type)
         {
-            std::shared_ptr<EthernetController> econtroller = 
-                std::dynamic_pointer_cast<EthernetController>(
-                    this->netowrk_manager->getInterface(interface_name));
+            std::shared_ptr<EthernetController> econtroller;
+            try
+            { 
+                econtroller = std::dynamic_pointer_cast<EthernetController>(
+                        this->netowrk_manager->getInterface(interface_name));
+            }
+            catch(std::out_of_range& e)
+            {
+                WarningLogger << "Failed to get " << interface_name << ": " << e.what() << std::endl;
+                continue;
+            }
 
             std::string ip(reader.Get(interface_name, "ip", ""));
             if(!ip.empty()) // static if IP is set
@@ -76,7 +84,17 @@ void INIFileConfigurator::configure()
         {
             ErrorLogger << "Unknown " << interface_type << " type for " << interface_name << std::endl;
         }
-    }
+    }    
+}
 
-    
+extern "C"
+{
+    Configurator* allocator(std::shared_ptr<NetworkManager> nm, std::string file_name)
+    {
+        return new INIFileConfigurator(nm, file_name);
+    }
+    void deallocator(Configurator* p)
+    {
+        delete p;
+    }
 }

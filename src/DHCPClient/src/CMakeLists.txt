@@ -15,4 +15,7 @@ install(FILES ${DHCPCLIENT_DIR}/dhcpclient DESTINATION ${PROJECT_BINARY_DIR}/out
 add_library(dhcp_client DHCPClient.cpp)
 target_link_libraries(dhcp_client PRIVATE system)
 target_include_directories(dhcp_client PUBLIC ../include/)
+target_compile_options(dhcp_client PRIVATE -fPIC)
+
+
 install(TARGETS dhcp_client DESTINATION ${PROJECT_BINARY_DIR}/output/lib/)

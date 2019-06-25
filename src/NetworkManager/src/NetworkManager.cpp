@@ -35,8 +35,8 @@ void NetworkManager::stop()
 void NetworkManager::checkerThread()
 {
     bool notify_start = false;
-    while(this->checker_running)
-    {
+    //while(this->checker_running) // for now use only on start
+    //{
         bool change = false;
         std::vector<std::string> interfaces_list = this->getSystemInterfacesList();
         std::map<std::string, std::shared_ptr<InterfaceController>> current_nm_interfaces = this->interfaces;
@@ -80,7 +80,7 @@ void NetworkManager::checkerThread()
             std::unique_lock<std::mutex> lk(this->checker_thread_timer_mutex);
             this->checker_thread_timer_cond.wait_for(lk,std::chrono::seconds(5));
         }
-    }
+    //}
 }
 
 std::vector<std::string> NetworkManager::getSystemInterfacesList()
