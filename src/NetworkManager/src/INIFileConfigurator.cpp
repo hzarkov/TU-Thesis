@@ -4,6 +4,9 @@
 #include "INIReader.h"
 
 #include <algorithm>
+#include <sstream>
+
+constexpr uint DEFAULT_DHCP_LEASE=7200;
 
 INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkManager> nm, std::string file_name)
 :FileConfigurator(nm, file_name)
@@ -53,6 +56,16 @@ void INIFileConfigurator::configure()
                 }
                
                 econtroller->setStatic(ip, netmask, gw, dns_servers);
+                std::string dhcp_range(reader.Get(interface_name, "dhcp-range", ""));
+                if(!dhcp_range.empty())
+                {
+                    std::stringstream ss(dhcp_range);
+                    std::string starting_ip, ending_ip;
+                    std::getline(ss, starting_ip, ',');
+                    std::getline(ss, ending_ip, ',');
+                    uint lease = reader.GetInteger(interface_name, "lease", DEFAULT_DHCP_LEASE);
+                    econtroller->setDHCPServer(starting_ip, ending_ip, lease);
+                }
             }
             else // dhcp if IP is not set
             {

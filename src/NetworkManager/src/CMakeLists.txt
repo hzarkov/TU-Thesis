@@ -1,5 +1,5 @@
 add_executable(network-manager main.cpp NetworkManager.cpp EthernetController.cpp INIFileConfigurator.cpp FileConfigurator.cpp Configurator.cpp)
-target_link_libraries(network-manager PRIVATE interface route logger stdc++fs ini-reader dhcpclient)
+target_link_libraries(network-manager PRIVATE interface route logger stdc++fs ini-reader dhcp_client dhcp_server dnsmasq_controller)
 target_include_directories(network-manager PRIVATE ../include/)
 install(TARGETS network-manager DESTINATION ${PROJECT_BINARY_DIR}/output/bin/)
 install(FILES configuration.ini DESTINATION ${PROJECT_BINARY_DIR}/output/config/)

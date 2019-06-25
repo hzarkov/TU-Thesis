@@ -6,6 +6,9 @@ set(COMPONENTS
         Interface 
         Route
         DHCPClient 
+        DNSMasqController
+        DHCPServer
+        DLoader
         NetworkManager
 )
 

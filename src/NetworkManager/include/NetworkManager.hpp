@@ -2,6 +2,8 @@
 #define NETWORK_MANAGER_HPP
 #include "InterfaceController.hpp"
 #include "Route.hpp"
+#include "DNSMasqController.hpp"
+#include "DHCPServer.hpp"
 
 #include <string>
 #include <map>
@@ -20,9 +22,14 @@ private:
     std::mutex checker_thread_timer_mutex;
     std::condition_variable checker_thread_start_cond;
     std::mutex checker_thread_start_mutex;
+
     std::map<std::string, std::shared_ptr<InterfaceController>> interfaces;
     std::mutex interfaces_mutex;
+
     std::map<int, std::shared_ptr<Route>> routes;
+
+    std::shared_ptr<DNSMasqController> dnsmasq_controller;
+    std::shared_ptr<DHCPServer> dhcp_server;
     // iptables rule list
     void addInterface(std::string interface_name);
     void removeInterface(std::string interface_name);

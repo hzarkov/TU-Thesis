@@ -6,6 +6,8 @@
 #include <chrono>
 
 NetworkManager::NetworkManager()
+:dnsmasq_controller(std::make_shared<DNSMasqController>()),
+dhcp_server(std::make_shared<DHCPServer>(dnsmasq_controller))
 {
 
 }
@@ -73,9 +75,12 @@ void NetworkManager::checkerThread()
             this->checker_thread_start_cond.notify_one();
             notify_start = true;
         }
-        std::unique_lock<std::mutex> lk(this->checker_thread_timer_mutex);
-        this->checker_thread_timer_cond.wait_for(lk,std::chrono::seconds(5));
-    }   
+        if(this->checker_running)
+        {
+            std::unique_lock<std::mutex> lk(this->checker_thread_timer_mutex);
+            this->checker_thread_timer_cond.wait_for(lk,std::chrono::seconds(5));
+        }
+    }
 }
 
 std::vector<std::string> NetworkManager::getSystemInterfacesList()
@@ -96,7 +101,7 @@ void NetworkManager::addInterface(std::string interface_name)
     if(interface_type == "en" || interface_type == "et")
     {
         std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
-        this->interfaces[interface_name] = std::make_shared<EthernetController>(interface_name);
+        this->interfaces[interface_name] = std::make_shared<EthernetController>(interface_name, dhcp_server);
     }
     else
     {
