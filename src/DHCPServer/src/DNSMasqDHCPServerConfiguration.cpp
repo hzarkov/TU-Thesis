@@ -7,11 +7,11 @@ const std::string dhcp_configuration_path = "/etc/dnsmasq.d/";
 const std::string base_dhcp_file_name = "dhcp-";
 const std::string dhcp_file_extension = ".conf";
 
-DNSMasqDHCPServerConfiguration::DNSMasqDHCPServerConfiguration(std::shared_ptr<std::mutex> conf_mutex, std::shared_ptr<DNSMasqController> dnsmasq_controller, std::string interface_name, std::string ip_range_start, std::string ip_range_end, uint lease)
+DNSMasqDHCPServerConfiguration::DNSMasqDHCPServerConfiguration(std::shared_ptr<std::mutex> conf_mutex, std::shared_ptr<DNSMasqController> dnsmasq_controller, std::hash<std::string> hasher, std::string interface_name, std::string ip_range_start, std::string ip_range_end, uint lease)
 :conf_mutex(conf_mutex),dnsmasq_controller(dnsmasq_controller)
 {
     std::lock_guard<std::mutex> conf_mutex_lock_guard(*this->conf_mutex);
-    std::hash<std::string> hasher;
+    
     size_t file_identity = hasher(ip_range_start);
 
     std::ofstream conf_file(dhcp_configuration_path + base_dhcp_file_name + std::to_string(file_identity) + dhcp_file_extension);

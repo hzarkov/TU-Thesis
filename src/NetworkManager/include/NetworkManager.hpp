@@ -26,7 +26,7 @@ private:
     std::map<std::string, std::shared_ptr<InterfaceController>> interfaces;
     std::mutex interfaces_mutex;
 
-    std::map<int, std::shared_ptr<Route>> routes;
+    std::vector<std::shared_ptr<Route>> routes;
 
     std::shared_ptr<DNSMasqController> dnsmasq_controller;
     std::shared_ptr<DHCPServer> dhcp_server;
@@ -42,7 +42,7 @@ public:
     void start();
     void stop();
     std::shared_ptr<InterfaceController> getInterface(std::string interface_name);
-    //int getRoute();
+    std::shared_ptr<Route> addRoute(std::string destination, std::string gateway="0.0.0.0", std::string interface_name="", int metric=0);
 };
 
 #endif

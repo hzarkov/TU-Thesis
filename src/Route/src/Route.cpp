@@ -54,3 +54,10 @@ std::string Route::getInterfaceName()
 {
     return this->interface_name;
 }
+
+
+bool Route::operator==(const Route& route)
+{
+    return ((this->destination == route.destination)&&
+        (this->metric == route.metric));
+}

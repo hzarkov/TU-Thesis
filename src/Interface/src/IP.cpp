@@ -31,3 +31,8 @@ std::ostream& operator<<(std::ostream& os, IP ip)
     os << ip.toString();
     return os;
 } 
+
+bool IP::operator==(const IP& ip)
+{
+    return ip.ip == this->ip; // ToDo: Must use toString function
+}

@@ -10,6 +10,7 @@ set(COMPONENTS
         DHCPServer
         DLoader
         NetworkManager
+        FileConfigurators
 )
 
 foreach( COMPONENT ${COMPONENTS})

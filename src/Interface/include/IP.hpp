@@ -14,7 +14,8 @@ public:
     bool isEmpty();
 
     friend std::string operator+(std::string base, IP ip);
-    friend std::ostream& operator<<(std::ostream& os, IP ip);  
+    friend std::ostream& operator<<(std::ostream& os, IP ip); 
+    bool operator==(const IP& ip); 
 };
 
 #endif
