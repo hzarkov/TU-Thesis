@@ -112,13 +112,14 @@ void NetworkManager::addInterface(std::string interface_name)
 
 std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric)
 {
-    auto found = std::find_if(this->routes.begin(),this->routes.end(),[destination,metric](auto element){
+    auto found = std::find_if(this->routes.begin(),this->routes.end(),[destination,metric](auto elem){
+        auto element = elem.lock();
         return element->getDestination() == destination && element->getMetric() == metric;
     });
 
     if(this->routes.end() != found)
     {
-        return *found;
+        return found->lock();
     }
     else
     {

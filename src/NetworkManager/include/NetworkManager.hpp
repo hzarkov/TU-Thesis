@@ -26,7 +26,7 @@ private:
     std::map<std::string, std::shared_ptr<InterfaceController>> interfaces;
     std::mutex interfaces_mutex;
 
-    std::vector<std::shared_ptr<Route>> routes;
+    std::vector<std::weak_ptr<Route>> routes;
 
     std::shared_ptr<DNSMasqController> dnsmasq_controller;
     std::shared_ptr<DHCPServer> dhcp_server;
