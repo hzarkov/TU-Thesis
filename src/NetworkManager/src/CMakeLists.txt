@@ -1,5 +1,5 @@
 add_library(network_controller SHARED NetworkManager.cpp EthernetController.cpp)
-target_link_libraries(network_controller PUBLIC interface route logger stdc++fs ini_reader dhcp_client dhcp_server dnsmasq_controller)
+target_link_libraries(network_controller PUBLIC interface route logger stdc++fs ini_reader dhcp_client dhcp_server dnsmasq_controller package_rule)
 target_include_directories(network_controller PUBLIC ../include/)
 target_compile_options(network_controller PRIVATE -fPIC)
 

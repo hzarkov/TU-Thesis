@@ -4,7 +4,8 @@ set(COMPONENTS
         Logger 
         System 
         Interface 
-        Route
+        Route 
+        PackageRule
         DHCPClient 
         DNSMasqController
         DHCPServer

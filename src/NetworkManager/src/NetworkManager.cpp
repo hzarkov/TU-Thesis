@@ -112,25 +112,85 @@ void NetworkManager::addInterface(std::string interface_name)
 
 std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric)
 {
-    auto found = std::find_if(this->routes.begin(),this->routes.end(),[destination,metric](auto elem){
+    std::lock_guard<std::mutex> routes_mutex_lock(this->routes_mutex);
+    std::shared_ptr<Route> result;
+    std::remove_if(this->routes.begin(),this->routes.end(), [](auto elem){
+        return elem.expired();
+    });
+
+    auto found = std::find_if(this->routes.begin(),this->routes.end(),[this,destination,metric](auto elem){
         auto element = elem.lock();
         return element->getDestination() == destination && element->getMetric() == metric;
     });
 
     if(this->routes.end() != found)
     {
-        return found->lock();
+        result = found->lock();
     }
     else
     {
         std::shared_ptr<Route> route = std::make_shared<Route>(destination, gateway, interface_name, metric);
         this->routes.push_back(route);
-        return route;
+        result = route;
     }
+    return result;
 }
 
 std::shared_ptr<InterfaceController> NetworkManager::getInterface(std::string interfaces_name)
 {
     std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
     return this->interfaces.at(interfaces_name);
+}
+
+std::shared_ptr<PackageRule> NetworkManager::addPackageRule(std::string rule, std::string type)
+{
+    std::lock_guard<std::mutex> package_rules_mutex_lock(this->package_rules_mutex);
+    std::shared_ptr<PackageRule> result;
+    std::remove_if(this->package_rules.begin(),this->package_rules.end(), [](auto elem){
+        return elem.expired();
+    });
+
+    auto found = std::find_if(this->package_rules.begin(),this->package_rules.end(),[rule](auto elem){
+        auto element = elem.lock();
+        return element->getRule() == rule;
+    });
+
+    if(this->package_rules.end() != found)
+    {
+        result = found->lock();
+    }
+    else
+    {
+        std::shared_ptr<PackageRule> package_rule = std::make_shared<PackageRule>(rule, type);
+        this->package_rules.push_back(package_rule);
+        result = package_rule;
+    }
+    return result;
+}
+
+
+std::shared_ptr<ChainRule> NetworkManager::addChainRule(std::string rule)
+{
+    std::lock_guard<std::mutex> chain_rules_mutex_lock(this->chain_rules_mutex);
+    std::shared_ptr<ChainRule> result;
+    std::remove_if(this->chain_rules.begin(),this->chain_rules.end(), [](auto elem){
+        return elem.expired();
+    });
+
+    auto found = std::find_if(this->chain_rules.begin(),this->chain_rules.end(),[rule](auto elem){
+        auto element = elem.lock();
+        return element->getRule() == rule;
+    });
+
+    if(this->chain_rules.end() != found)
+    {
+        result = found->lock();
+    }
+    else
+    {
+        std::shared_ptr<ChainRule> chain_rule = std::make_shared<ChainRule>(rule);
+        this->chain_rules.push_back(chain_rule);
+        result = chain_rule;
+    }
+    return result;
 }
