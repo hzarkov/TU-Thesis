@@ -3,9 +3,12 @@
 #include "INIReader.h"
 #include "DLoader.hpp"
 #include "Configurator.hpp"
+#include "InternetSwitcher.hpp"
 
 #include <memory>
 #include <signal.h>
+#include <sstream>
+
 const std::string NM_PLUGIN_CONFIGURATION_FILE = "../config/nmPluginConfiguration.ini";
 int main(int argc, char const *argv[])
 {
@@ -32,19 +35,35 @@ int main(int argc, char const *argv[])
         throw std::runtime_error("Can't load " + NM_PLUGIN_CONFIGURATION_FILE);
     }
     std::set<std::string> sections = reader.Sections();
-    std::map<std::string,std::shared_ptr<DLoader>> loaded_configurations;
-    std::vector<std::shared_ptr<Configurator>> configuration_instances;
+    std::map<std::string,std::shared_ptr<DLoader>> loaded_plugins;
+    std::vector<std::shared_ptr<Plugin>> plugin_instances;
     for (std::set<std::string>::iterator it = sections.begin(); it != sections.end(); ++it)
     {
-        std::string configuration_type = *it;
-        if("INIFileConfigurator" == configuration_type)
+        std::string plugin_type = *it;
+        if("INIFileConfigurator" == plugin_type)
         {
-            std::string ini_file(reader.Get(configuration_type, "file", ""));
-            loaded_configurations[configuration_type] = std::make_shared<DLoader>("../lib/libini_nm_configurator.so");
+            std::string ini_file(reader.Get(plugin_type, "file", ""));
+            loaded_plugins[plugin_type] = std::make_shared<DLoader>("../lib/libini_nm_configurator.so");
             std::shared_ptr<Configurator> conf = 
-                loaded_configurations[configuration_type]->createInstance<Configurator>(network_manager, ini_file);
+                loaded_plugins[plugin_type]->createInstance<Configurator>(network_manager, ini_file);
             conf->configure();
-            configuration_instances.push_back(conf);
+            plugin_instances.push_back(conf);
+        }
+        else if("PingInternetSwitcher" == plugin_type)
+        {
+            std::string interfaces_string(reader.Get(plugin_type, "interfaces", ""));
+            std::vector<std::string> interfaces;
+            std::stringstream ss(interfaces_string);
+            std::string item;
+            while (std::getline(ss, item, ',')) 
+            {
+                interfaces.push_back(item);
+            }
+            loaded_plugins[plugin_type] = std::make_shared<DLoader>("../lib/libping_internet_switcher.so");
+            std::shared_ptr<InternetSwitcher> internet_switcher = 
+                loaded_plugins[plugin_type]->createInstance<InternetSwitcher>(network_manager, interfaces);
+            internet_switcher->start();
+            plugin_instances.push_back(internet_switcher);
         }
     }
     // Wait for stop signal (SIGINT, SIGTERM).

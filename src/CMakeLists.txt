@@ -12,6 +12,7 @@ set(COMPONENTS
         DLoader
         NetworkManager
         FileConfigurators
+        InternetSwitchers
 )
 
 foreach( COMPONENT ${COMPONENTS})

@@ -38,7 +38,7 @@ void INIFileConfigurator::configure()
             try
             { 
                 econtroller = std::dynamic_pointer_cast<EthernetController>(
-                        this->netowrk_manager->getInterface(interface_name));
+                        this->network_manager->getInterface(interface_name));
             }
             catch(std::out_of_range& e)
             {

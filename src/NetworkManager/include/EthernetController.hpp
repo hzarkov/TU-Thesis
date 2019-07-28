@@ -1,7 +1,6 @@
 #ifndef ETHERNET_CONTROLLER_HPP
 #define ETHERNET_CONTROLLER_HPP
 #include "InterfaceController.hpp"
-#include "Interface.hpp"
 #include "DHCPClient.hpp"
 #include "DHCPServer.hpp"
 
@@ -11,7 +10,6 @@
 class EthernetController : public InterfaceController
 {
 private:
-    std::unique_ptr<Interface> interface;
     std::shared_ptr<DHCPServer> dhcp_server;
     std::shared_ptr<DHCPServerConfiguration> dhcp_server_configuration;
     DHCPClient dhcp_client;

@@ -2,7 +2,7 @@
 #include "Logger.hpp"
 #include "System.hpp"
 
-Route::Route(IP destination,IP gateway, std::string interface_name, int metric)
+Route::Route(IP destination, IP gateway, std::string interface_name, int metric)
 :destination(destination), gateway(gateway), metric(metric), interface_name(interface_name)
 {
     this->routeConfiguration("add");
@@ -23,7 +23,7 @@ Route::~Route()
 void Route::routeConfiguration(std::string option)
 {
     std::string interface_string = "";
-    if(!interface_name.empty())
+    if(!this->interface_name.empty())
     {
         interface_string = " dev " + this->interface_name; 
     }

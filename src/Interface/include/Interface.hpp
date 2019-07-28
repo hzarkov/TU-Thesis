@@ -37,6 +37,8 @@ public:
     void setGW(IP ip);
     void setDNS(std::vector<IP> ips);
 
+    IP getGW();
+
     int registerGatewayCallback(std::function<void(IP gateway)> callback);
     int registerIPCallback(std::function<void(IP ip, IP mask)> callback);
     int registerDNSCallback(std::function<void(std::vector<IP> dns_servers)> callback);

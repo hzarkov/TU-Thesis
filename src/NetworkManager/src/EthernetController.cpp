@@ -14,7 +14,7 @@ void EthernetController::configureInterface(std::string ip, std::string netmask,
 }
 
 EthernetController::EthernetController(std::string interface_name, std::shared_ptr<DHCPServer> dhcp_server)
-:interface(std::make_unique<Interface>(interface_name)),dhcp_server(dhcp_server), dhcp_client(interface_name)
+:InterfaceController(interface_name),dhcp_server(dhcp_server), dhcp_client(interface_name)
 {
     dhcp_client.registerConfigCallback(std::bind(&EthernetController::configureInterface, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));

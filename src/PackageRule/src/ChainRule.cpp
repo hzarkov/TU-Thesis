@@ -1,11 +1,12 @@
 #include "ChainRule.hpp"
+#include "System.hpp"
 
 #include <stdexcept>
 
 ChainRule::ChainRule(std::string rule)
 :rule(rule)
 {
-    if(0 != system(("iptables -N " + this->rule).c_str()))
+    if(0 != System::call("iptables -N " + this->rule))
     {
         throw std::runtime_error("System execution of '" + rule + "' failed.");
     }
@@ -18,5 +19,5 @@ std::string ChainRule::getRule()
 
 ChainRule::~ChainRule()
 {
-    system(("iptables -X " + this->rule).c_str());
+    System::call("iptables -X " + this->rule);
 }

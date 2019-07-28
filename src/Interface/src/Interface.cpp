@@ -75,6 +75,11 @@ void Interface::setDNS(std::vector<IP> dns_servers)
     this->callCallbacksOf(this->dns_change_callback, this->dns_servers);
 }
 
+IP Interface::getGW()
+{
+    return this->gateway;
+}
+
 int Interface::registerGatewayCallback(std::function<void(IP gateway)> callback)
 {
     return this->registerCallback(this->gateway_change_callback, callback);
