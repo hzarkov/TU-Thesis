@@ -16,7 +16,7 @@ XTables::Chain::RuleID XTables::Chain::addRules(std::string rule, std::string ty
 {
     std::lock_guard<std::mutex> package_rules_mutex_lock(this->package_rules_mutex);
     static XTables::Chain::RuleID rule_id = 0;
-    this->package_rules[rule_id] = std::make_unique<Rule>(rule, type);
+    this->package_rules[rule_id] = std::make_unique<ChainRule>(rule, type);
     return rule_id++;
 }
 

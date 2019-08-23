@@ -1,6 +1,6 @@
-#ifndef CHAIN_RULE_HPP
-#define CHAIN_RULE_HPP
-#include "Rule.hpp"
+#ifndef XTABLES_CHAIN_HPP
+#define XTABLES_CHAIN_HPP
+#include "ChainRule.hpp"
 
 #include <string>
 #include <map>
@@ -20,7 +20,7 @@ namespace XTables
         std::string getName();
     private:
        std::string name;
-       std::map<RuleID, std::unique_ptr<XTables::Rule>> package_rules;
+       std::map<RuleID, std::unique_ptr<XTables::ChainRule>> package_rules;
        std::mutex package_rules_mutex;
     };
 };

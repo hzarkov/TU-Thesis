@@ -1,10 +1,10 @@
-#include "Rule.hpp"
+#include "ChainRule.hpp"
 #include "System.hpp"
 
 #include <stdexcept>
 #include <regex>
 
-XTables::Rule::Rule(std::string rule, std::string type)
+XTables::ChainRule::ChainRule(std::string rule, std::string type)
 :rule(rule)
 {
     if(0 != System::call("iptables " + type + " " + rule))
@@ -13,7 +13,7 @@ XTables::Rule::Rule(std::string rule, std::string type)
     }
 }
 
-XTables::Rule::~Rule()
+XTables::ChainRule::~ChainRule()
 {
     std::regex exp("-c [[:digit:]]+ [[:digit:]]+");
     std::string res_rule = std::regex_replace( this->rule, exp, "" );
