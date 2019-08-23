@@ -40,7 +40,7 @@ void NetworkManager::checkerThread()
     //{
         //bool change = false;
         std::vector<std::string> interfaces_list = this->getSystemInterfacesList();
-        std::map<std::string, std::shared_ptr<InterfaceController>> current_nm_interfaces = this->interfaces;
+        /*std::map<std::string, std::shared_ptr<InterfaceController>> current_nm_interfaces = this->interfaces;
         
         for(auto interface : current_nm_interfaces)
         {
@@ -51,7 +51,7 @@ void NetworkManager::checkerThread()
                 this->interfaces.erase(interface.first);
                 //change = true;
             }
-        }
+        }*/
 
         for(auto interface_name : interfaces_list)
         {
@@ -96,10 +96,10 @@ std::vector<std::string> NetworkManager::getSystemInterfacesList()
     return result;
 }
 
-void NetworkManager::addInterface(std::string interface_name)
+void NetworkManager::addInterface(std::string interface_name) // add callback for in case of removal
 {
     std::string interface_type = interface_name.substr(0,2);
-    if(interface_type == "en" || interface_type == "et")
+    if(interface_type == "en" || interface_type == "et" || interface_type == "us")
     {
         std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
         this->interfaces[interface_name] = std::make_shared<EthernetController>(interface_name, dhcp_server);

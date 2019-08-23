@@ -10,9 +10,10 @@ private:
     IP gateway;
     int metric;
     std::string interface_name;
+    std::string table_name;
     void routeConfiguration(std::string option);
 public:
-    Route(IP destination, IP gateway=IP("0.0.0.0"), std::string interface_name="", int metric=0);
+    Route(IP destination, IP gateway=IP("0.0.0.0"), std::string interface_name="", int metric=0, std::string table_name="");
     ~Route();
 
     IP getDestination();

@@ -2,8 +2,8 @@
 #include "Logger.hpp"
 #include "System.hpp"
 
-Route::Route(IP destination, IP gateway, std::string interface_name, int metric)
-:destination(destination), gateway(gateway), metric(metric), interface_name(interface_name)
+Route::Route(IP destination, IP gateway, std::string interface_name, int metric, std::string table_name)
+:destination(destination), gateway(gateway), metric(metric), interface_name(interface_name), table_name(table_name)
 {
     this->routeConfiguration("add");
 }
@@ -27,8 +27,13 @@ void Route::routeConfiguration(std::string option)
     {
         interface_string = " dev " + this->interface_name; 
     }
+    std::string table_string = "";
+    if(!this->table_name.empty())
+    {
+        table_string = " table " + this->table_name;
+    }
     std::string metric_string = " metric " + std::to_string(this->metric);
-    std::string cmd="ip route " + option + " " + this->destination + " via " + this->gateway + interface_string + metric_string;
+    std::string cmd = "ip route " + option + " " + this->destination + " via " + this->gateway + interface_string + metric_string + table_string;
     if( 0 != System::call(cmd))
     {
         throw std::runtime_error("Failed to execute: " + cmd);

@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+const std::string PING_ADDRESS = "8.8.8.8";
 PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm, std::vector<std::string> interface_names)
 :InternetSwitcher(nm)
 {
@@ -17,7 +18,7 @@ PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm, s
         }
         catch(std::exception& e)
         {
-            WarningLogger << e.what() << std::endl;
+            WarningLogger << "Failed to load " << interface_name << ": " << e.what() << std::endl;
         }
     }
 }
@@ -52,15 +53,15 @@ void PingInternetSwitcher::Run()
         {
             try
             {
-                std::shared_ptr<Route> route = this->network_manager->addRoute("8.8.8.8/32", interface->getGW());
-                if(0 == System::call("ping -c 1 8.8.8.8"))
+                std::shared_ptr<Route> route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
+                if(0 == System::call("ping -c " + PING_ADDRESS))
                 {
                     default_gw = this->network_manager->addRoute("0.0.0.0/0", interface->getGW());
                 }
             }
             catch(std::exception& e)
             {
-                WarningLogger << e.what() << std::endl;
+                WarningLogger << "Failed to check internet connection of " << interface << ": " << e.what() << std::endl;
             }
         }
         std::unique_lock<std::mutex> lk(this->thread_block_mutex);
