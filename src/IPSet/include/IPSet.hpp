@@ -1,14 +1,14 @@
-#ifndef IP_SET_HPP
-#define IP_SET_HPP
-
+#ifndef IPSET_HPP
+#define IPSET_HPP
 #include <string>
 
 class IPSet
 {
 public:
     IPSet(std::string name, std::string type);
-    ~IPSet(); 
+    ~IPSet();
 private:
     std::string name;
 };
+
 #endif
