@@ -14,7 +14,7 @@ public:
     ~TrafficSpecialization() = default;
 private:
     std::shared_ptr<RouteRule> route_rule;
-    std::shared_ptr<Route> route;
+    std::vector<std::shared_ptr<Route>> routes;
     std::shared_ptr<IPSet> ipset;
     std::shared_ptr<XTables::Chain> mangle_prerouting_chain;
     std::shared_ptr<XTables::Chain> mangle_output_chain;

@@ -6,3 +6,11 @@ Plugin::Plugin(std::shared_ptr<NetworkManager> nm)
 {
     
 }
+
+extern "C"
+{
+    void deallocator(Plugin* p)
+    {
+        delete p;
+    }
+}

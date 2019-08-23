@@ -11,4 +11,7 @@ endif(NOT DEFINED INSTALL_PATH)
 
 set(CMAKE_INSTALL_RPATH ${INSTALL_PATH}/lib)
 
+install(FILES nm.service DESTINATION ${INSTALL_PATH}/etc/systemd/system/)
+install(PROGRAMS start.sh DESTINATION ${INSTALL_PATH}/)
+
 add_subdirectory(src)

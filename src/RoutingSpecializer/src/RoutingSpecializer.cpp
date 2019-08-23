@@ -1,42 +1,53 @@
 #include "RoutingSpecializer.hpp"
 #include "Logger.hpp"
 
-RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkManager> nm, std::string interface, std::vector<std::string> route_domains)
-:TrafficSpecializer(nm)
+RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkManager> nm)
+:Plugin(nm)
 {
-    this->traffic_specialization = std::make_unique<TrafficSpecialization>(nm, interface);
-    for(auto route : route_domains)
+   
+}
+
+void RoutingSpecializer::configure(std::map<std::string, std::string> conf)
+{
+    for(auto configuration : conf)
     {
-        if(1) //ToDo: Check if route is IP or domain
+        this->traffic_specialization = std::make_unique<TrafficSpecialization>(this->network_manager, configuration.first);
+        std::stringstream ss(configuration.second);
+        std::string route;
+        while (std::getline(ss, route, ',')) 
         {
-            try
+            if(1) //ToDo: Check if route is IP or domain
             {
-                this->traffic_specialization->addIP(route);
+                try
+                {
+                    this->traffic_specialization->addIP(route);
+                }
+                catch(std::exception& e)
+                {
+                    ErrorLogger << e.what() << std::endl;
+                }
             }
-            catch(std::exception& e)
+            else if(1)
             {
-                ErrorLogger << e.what() << std::endl;
+                this->traffic_specialization->addDomain(route);
             }
+            else
+            {
+                 WarningLogger << "Unknown domain type of '" + route << "'" << std::endl;
+            } 
         }
-        else if(1)
-        {
-            this->traffic_specialization->addDomain(route);
-        }
-        else
-        {
-            throw std::invalid_argument("Unknown domain type: " + route);
-        } 
-    }
+    }   
+}
+
+void RoutingSpecializer::exec()
+{
+
 }
 
 extern "C"
 {
-    TrafficSpecializer* allocator(std::shared_ptr<NetworkManager> nm, std::string interface, std::vector<std::string> route_domains)
+    Plugin* allocator(std::shared_ptr<NetworkManager> nm)
     {
-        return new RoutingSpecializer(nm, interface, route_domains);
-    }
-    void deallocator(TrafficSpecializer* p)
-    {
-        delete p;
+        return new RoutingSpecializer(nm);
     }
 }

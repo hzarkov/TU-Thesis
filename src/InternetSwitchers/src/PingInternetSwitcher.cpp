@@ -5,10 +5,17 @@
 #include <chrono>
 
 const std::string PING_ADDRESS = "8.8.8.8";
-PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm, std::vector<std::string> interface_names)
-:InternetSwitcher(nm)
+PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm)
+:Plugin(nm)
 {
-    for(auto interface_name: interface_names)
+    
+}
+
+void PingInternetSwitcher::configure(std::map<std::string, std::string> conf)
+{
+    std::stringstream ss(conf["interfaces"]);
+    std::string interface_name;
+    while (std::getline(ss, interface_name, ',')) 
     {
         std::shared_ptr<InterfaceController> interface;
         try
@@ -23,24 +30,13 @@ PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm, s
     }
 }
 
-void PingInternetSwitcher::start()
+void PingInternetSwitcher::exec()
 {
     std::lock_guard<std::mutex> thread_mutex_lock(this->thread_mutex);
     if(false == this->running)
     {            
         this->running = true;
         this->thread = std::thread(&PingInternetSwitcher::Run, this);
-    }
-}
-
-void PingInternetSwitcher::stop()
-{
-    std::lock_guard<std::mutex> thread_mutex_lock(this->thread_mutex);
-    if(false != this->running)
-    {
-        this->running = false;
-        this->thread_block.notify_all();
-        this->thread.join();
     }
 }
 
@@ -71,18 +67,19 @@ void PingInternetSwitcher::Run()
 
 PingInternetSwitcher::~PingInternetSwitcher()
 {
-    this->stop();
+    std::lock_guard<std::mutex> thread_mutex_lock(this->thread_mutex);
+    if(false != this->running)
+    {
+        this->running = false;
+        this->thread_block.notify_all();
+        this->thread.join();
+    }
 }
 
 extern "C"
 {
-    InternetSwitcher* allocator(std::shared_ptr<NetworkManager> nm, std::vector<std::string> interfaces)
+    Plugin* allocator(std::shared_ptr<NetworkManager> nm)
     {
-        return new PingInternetSwitcher(nm, interfaces);
-    }
-
-    void deallocator(InternetSwitcher* p)
-    {
-        delete p;
+        return new PingInternetSwitcher(nm);
     }
 }

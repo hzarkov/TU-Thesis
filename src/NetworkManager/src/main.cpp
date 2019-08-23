@@ -2,15 +2,49 @@
 #include "Logger.hpp"
 #include "INIReader.h"
 #include "DLoader.hpp"
-#include "Configurator.hpp"
-#include "InternetSwitcher.hpp"
-#include "TrafficSpecializer.hpp"
+#include "Plugin.hpp"
 
 #include <memory>
 #include <signal.h>
 #include <sstream>
 
 const std::string NM_PLUGIN_CONFIGURATION_FILE = "../config/nmPluginConfiguration.ini";
+
+std::map<std::string,std::string> getPluginConfiguration(INIReader& reader, std::string plugin_type)
+{
+    std::map<std::string,std::string> configuration;
+    if("ini_nm_configurator" == plugin_type)
+    {   
+        std::string ini_file(reader.Get(plugin_type, "file", ""));
+        configuration["file"] = ini_file;
+    }
+    else if("ping_internet_switcher" == plugin_type)
+    {
+
+        std::string interfaces_string(reader.Get(plugin_type, "interfaces", ""));
+        std::vector<std::string> interfaces;
+        std::stringstream ss(interfaces_string);
+        std::string item;
+        while (std::getline(ss, item, ',')) 
+        {
+            interfaces.push_back(item);
+        }
+    }
+    else if("routing_specializer" == plugin_type)
+    {
+        std::string interface_string(reader.Get(plugin_type, "interfaces", ""));
+
+        std::stringstream ss(interface_string);
+        std::string interface_name;
+        while (std::getline(ss, interface_name, ',')) 
+        {
+            std::string specialization_destinations(reader.Get(plugin_type, interface_name, ""));
+            configuration[interface_name] = specialization_destinations;
+        }            
+    }
+    return configuration;
+}
+
 int main(int argc, char const *argv[])
 {
     // Block stop signals.
@@ -41,78 +75,31 @@ int main(int argc, char const *argv[])
     for (std::set<std::string>::iterator it = sections.begin(); it != sections.end(); ++it)
     {
         std::string plugin_type = *it;
-        if("INIFileConfigurator" == plugin_type)
-        {   
-            std::string ini_file(reader.Get(plugin_type, "file", ""));
-            std::shared_ptr<DLoader> plugin_dl;
-            try
-            {
-                plugin_dl = loaded_plugins.at(plugin_type);
-            }
-            catch(std::exception& e)
-            {
-                plugin_dl = std::make_shared<DLoader>("../lib/libini_nm_configurator.so");
-                loaded_plugins[plugin_type] = plugin_dl;
-            }
 
-            std::shared_ptr<Configurator> conf = 
-                plugin_dl->createInstance<Configurator>(network_manager, ini_file);
-            conf->configure();
-            plugin_instances.push_back(conf);
-        }
-        else if("PingInternetSwitcher" == plugin_type)
+        std::shared_ptr<DLoader> plugin_dl;
+        try
         {
-
-            std::string interfaces_string(reader.Get(plugin_type, "interfaces", ""));
-            std::vector<std::string> interfaces;
-            std::stringstream ss(interfaces_string);
-            std::string item;
-            while (std::getline(ss, item, ',')) 
-            {
-                interfaces.push_back(item);
-            }            
-            std::shared_ptr<DLoader> plugin_dl;
-            try
-            {
-                plugin_dl = loaded_plugins.at(plugin_type);
-            }
-            catch(std::exception& e)
-            {
-                plugin_dl = std::make_shared<DLoader>("../lib/libping_internet_switcher.so");
-                loaded_plugins[plugin_type] = plugin_dl;
-            }
-
-            std::shared_ptr<InternetSwitcher> internet_switcher = 
-                plugin_dl->createInstance<InternetSwitcher>(network_manager, interfaces);
-            internet_switcher->start();
-            plugin_instances.push_back(internet_switcher);
+            plugin_dl = loaded_plugins.at(plugin_type);
         }
-        else if("RoutingSpecializer" == plugin_type)
+        catch(std::exception& e)
         {
-            std::string interface_string(reader.Get(plugin_type, "interface", ""));
-            std::string destinations_string(reader.Get(plugin_type, "specialized_destinations", ""));
-            DebugLogger << interface_string << std::endl;
-            std::vector<std::string> spec_dests;
-            std::stringstream ss(destinations_string);
-            std::string item;
-            while (std::getline(ss, item, ',')) 
-            {
-                spec_dests.push_back(item);
-            }            
+            plugin_dl = std::make_shared<DLoader>("../lib/lib" + plugin_type + ".so");
+            loaded_plugins[plugin_type] = plugin_dl;
+        }
 
-            std::shared_ptr<DLoader> plugin_dl;
-            try
-            {
-                plugin_dl = loaded_plugins.at(plugin_type);
-            }
-            catch(std::exception& e)
-            {
-                plugin_dl = std::make_shared<DLoader>("../lib/librouting_specializer.so");
-                loaded_plugins[plugin_type] = plugin_dl;
-            }
-            std::shared_ptr<TrafficSpecializer> traffic_specizlizer = 
-                plugin_dl->createInstance<TrafficSpecializer>(network_manager, interface_string, spec_dests);
-            plugin_instances.push_back(traffic_specizlizer);
+        std::shared_ptr<Plugin> plugin = 
+            plugin_dl->createInstance<Plugin>(network_manager);
+        plugin_instances.push_back(plugin);
+
+        auto configuration = getPluginConfiguration(reader, plugin_type);
+        try
+        {
+            plugin->configure(configuration);
+            plugin->exec();
+        }
+        catch(std::exception& e)
+        {
+            ErrorLogger << plugin_type << ": " << e.what() << std::endl;
         }
     }
     // Wait for stop signal (SIGINT, SIGTERM).

@@ -1,0 +1,9 @@
+[Unit]
+Description="Network manager of Hristiyan Zarkov's Thesis for Technical University of Sofia"
+
+[Service]
+ExecStart=/home/vision/Desktop/TU-Thesis/build/flash/start.sh
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

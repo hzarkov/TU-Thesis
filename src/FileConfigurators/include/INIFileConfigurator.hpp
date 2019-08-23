@@ -9,14 +9,10 @@ class INIFileConfigurator : public FileConfigurator
 private:
 
 public:
-    INIFileConfigurator(std::shared_ptr<NetworkManager> nm, std::string file_name);
+    INIFileConfigurator(std::shared_ptr<NetworkManager> nm);
     ~INIFileConfigurator() = default;
-    void configure();
+    void exec();
+    void config(std::map<std::string, std::string> conf);
 };
 
-extern "C"
-{
-    Configurator* allocator(std::shared_ptr<NetworkManager> nm, std::string file_name);
-    void deallocator(Configurator* p);
-}
 #endif

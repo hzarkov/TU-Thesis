@@ -1,21 +1,17 @@
 #ifndef ROUTING_SPECIALIZER_HPP
 #define ROUTING_SPECIALIZER_HPP
 
-#include "TrafficSpecializer.hpp"
+#include "Plugin.hpp"
 #include "TrafficSpecialization.hpp"
 
-class RoutingSpecializer : public TrafficSpecializer
+class RoutingSpecializer : public Plugin
 {
 public:
-    RoutingSpecializer(std::shared_ptr<NetworkManager> nm, std::string interface, std::vector<std::string> route_domains);  
+    RoutingSpecializer(std::shared_ptr<NetworkManager> nm);  
     ~RoutingSpecializer() = default;
+    void configure(std::map<std::string, std::string> conf);
+    void exec();
 private:
     std::unique_ptr<TrafficSpecialization> traffic_specialization;
 };
-
-extern "C"
-{
-    TrafficSpecializer* allocator(std::shared_ptr<NetworkManager> nm, std::string interface, std::vector<std::string> route_domains);
-    void deallocator(TrafficSpecializer* p);
-}
 #endif

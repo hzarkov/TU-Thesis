@@ -1,7 +1,7 @@
 #ifndef PING_INSTERNER_SWITCHER
 #define PING_INSTERNER_SWITCHER
 
-#include "InternetSwitcher.hpp"
+#include "Plugin.hpp"
 #include "InterfaceController.hpp"
 
 #include <string>
@@ -10,13 +10,13 @@
 #include <mutex>
 #include <condition_variable>
 
-class PingInternetSwitcher : public InternetSwitcher
+class PingInternetSwitcher : public Plugin
 {
 public:
-    PingInternetSwitcher(std::shared_ptr<NetworkManager> nm, std::vector<std::string> interfaces);
+    PingInternetSwitcher(std::shared_ptr<NetworkManager> nm);
     ~PingInternetSwitcher();
-    void start();
-    void stop();
+    void configure(std::map<std::string, std::string> conf);
+    void exec();
 private:
     void Run();
 
