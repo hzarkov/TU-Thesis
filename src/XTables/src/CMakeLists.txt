@@ -1,5 +1,5 @@
-add_library(xtables SHARED Chain.cpp ChainRule.cpp)
-target_link_libraries(xtables PUBLIC system)
+add_library(xtables SHARED Table.cpp Chain.cpp ChainRule.cpp)
+target_link_libraries(xtables PUBLIC system logger)
 target_include_directories(xtables PUBLIC ../include/)
 
 

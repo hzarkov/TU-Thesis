@@ -18,6 +18,7 @@ public:
 
     IP getDestination();
     IP getGateway();
+    std::string getTable();
     int getMetric();
     std::string getInterfaceName();
     bool operator==(const Route& route);

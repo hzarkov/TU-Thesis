@@ -13,6 +13,21 @@ IPSet::IPSet(std::string name, std::string type)
     }
 }
 
+std::string IPSet::getName()
+{
+    return this->name;
+}
+
+
+void IPSet::addIP(std::string ip)
+{
+    std::string cmd = "ipset add " + this->name + " " + ip;
+    if (0 != System::call(cmd))
+    {
+        throw std::runtime_error("Failed to add '" + ip + "' to '" + this->name + "' ipset using: " + cmd);
+    }
+}
+
 IPSet::~IPSet()
 {
     System::call("ipset destroy " + this->name);

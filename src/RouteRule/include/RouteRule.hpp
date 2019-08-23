@@ -5,9 +5,13 @@
 class RouteRule
 {
 public:
-    RouteRule(std::string rule_data);
+    RouteRule(uint priority, uint lookup, std::string additional_data = "");
+    uint getPriority();
+    uint getLookup();
     ~RouteRule();
 private:
-   std::string rule_data;
+    uint priority;
+    uint lookup;
+    std::string additional_data;
 };
 #endif

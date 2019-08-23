@@ -17,6 +17,8 @@ set(COMPONENTS
         NetworkManager
         FileConfigurators
         InternetSwitchers
+        TrafficSpecialization
+        RoutingSpecializer
 )
 
 foreach( COMPONENT ${COMPONENTS})

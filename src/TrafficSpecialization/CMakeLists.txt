@@ -1,3 +1,3 @@
-project("TrafficSpecialization")
+project(TrafficSpecialization)
 
-add_subdirectory("src")
+add_subdirectory(src)

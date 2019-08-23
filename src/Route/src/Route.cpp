@@ -60,6 +60,10 @@ std::string Route::getInterfaceName()
     return this->interface_name;
 }
 
+std::string Route::getTable()
+{
+    return this->table_name;
+}
 
 bool Route::operator==(const Route& route)
 {

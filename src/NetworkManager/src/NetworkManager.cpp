@@ -9,7 +9,9 @@ NetworkManager::NetworkManager()
 :dnsmasq_controller(std::make_shared<DNSMasqController>()),
 dhcp_server(std::make_shared<DHCPServer>(dnsmasq_controller))
 {
-
+    this->xtables["filter"] = std::make_shared<XTables::Table>("filter");
+    this->xtables["nat"] = std::make_shared<XTables::Table>("nat");
+    this->xtables["mangle"] = std::make_shared<XTables::Table>("mangle");
 }
 
 NetworkManager::~NetworkManager()
@@ -110,60 +112,72 @@ void NetworkManager::addInterface(std::string interface_name) // add callback fo
     }
 }
 
-std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric)
-{
-    std::lock_guard<std::mutex> routes_mutex_lock(this->routes_mutex);
-    std::shared_ptr<Route> result;
-    std::remove_if(this->routes.begin(),this->routes.end(), [](auto elem){
-        return elem.expired();
-    });
-
-    auto found = std::find_if(this->routes.begin(),this->routes.end(),[this,destination,metric](auto elem){
-        auto element = elem.lock();
-        return element->getDestination() == destination && element->getMetric() == metric;
-    });
-
-    if(this->routes.end() != found)
-    {
-        result = found->lock();
-    }
-    else
-    {
-        std::shared_ptr<Route> route = std::make_shared<Route>(destination, gateway, interface_name, metric);
-        this->routes.push_back(route);
-        result = route;
-    }
-    return result;
-}
-
 std::shared_ptr<InterfaceController> NetworkManager::getInterface(std::string interfaces_name)
 {
     std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
     return this->interfaces.at(interfaces_name);
 }
 
-std::shared_ptr<XTables::Chain> NetworkManager::getXTablesChain(std::string name)
+std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric, std::string table)
 {
-    std::lock_guard<std::mutex> chain_rules_mutex_lock(this->chain_rules_mutex);
-    std::shared_ptr<XTables::Chain> result;
-    std::remove_if(this->chain_rules.begin(),this->chain_rules.end(), [](auto elem){
+    std::lock_guard<std::mutex> routes_mutex_lock(this->routes_mutex);
+    std::shared_ptr<Route> result;
+    auto find_function = [destination, metric, table](auto elem){
+         auto element = elem.lock();
+        return element->getDestination() == destination && element->getMetric() == metric && element->getTable() == table;
+    };
+    result = this->getWeakElement<Route>(this->routes, find_function, destination, gateway, interface_name, metric, table);
+    return result;
+}
+
+std::shared_ptr<RouteRule> NetworkManager::getRouteRule(uint priority, uint lookup, std::string additional_data)
+{
+    std::lock_guard<std::mutex> route_rules_mutex_lock(this->route_rules_mutex);
+    std::shared_ptr<RouteRule> result;
+    auto find_function = [priority, lookup](auto elem){
+         auto element = elem.lock();
+        return element->getPriority() == priority && element->getLookup() == lookup;
+    };
+    result = this->getWeakElement<RouteRule>(this->route_rules, find_function, priority, lookup, additional_data);
+    return result;
+}
+
+std::shared_ptr<IPSet> NetworkManager::getIPSet(std::string name, std::string type)
+{
+    std::lock_guard<std::mutex> ipsets_mutex_lock(this->ipsets_mutex);
+    std::shared_ptr<IPSet> result;
+    auto find_function = [name](auto elem){
+        auto element = elem.lock();
+        return element->getName() == name;
+    };
+    result = this->getWeakElement<IPSet>(this->ipsets, find_function, name, type);
+    return result;
+}
+
+std::shared_ptr<XTables::Table> NetworkManager::getXTable(std::string name)
+{
+    return this->xtables.at(name);
+}
+
+template<typename T, typename Array_t, typename ...Args>
+std::shared_ptr<T> NetworkManager::getWeakElement(Array_t array, std::function<bool (std::weak_ptr<T> elem)> find_function, Args... args)
+{
+    std::shared_ptr<T> result;
+    std::remove_if(array.begin(),array.end(), [](auto elem){
         return elem.expired();
     });
 
-    auto found = std::find_if(this->chain_rules.begin(),this->chain_rules.end(),[name](auto elem){
-        auto element = elem.lock();
-        return element->getName() == name;
-    });
+    auto found = std::find_if(array.begin(),array.end(), find_function);
 
-    if(this->chain_rules.end() != found)
+    if(array.end() != found)
     {
         result = found->lock();
     }
     else
     {
-        std::shared_ptr<XTables::Chain> chain_rule = std::make_shared<XTables::Chain>(name);
-        this->chain_rules.push_back(chain_rule);
-        result = chain_rule;
+        std::shared_ptr<T> new_element = std::make_shared<T>(args...);
+        array.push_back(new_element);
+        result = new_element;
     }
     return result;
 }

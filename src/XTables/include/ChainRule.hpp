@@ -6,10 +6,12 @@ namespace XTables
     class ChainRule
     {
     public:
-        ChainRule(std::string rule, std::string type = "-A");
+        ChainRule(std::string table_name, std::string chain_name, std::string rule, std::string type = "-A");
         ~ChainRule();
     private:
-       std::string rule;    
+        std::string table_name;
+        std::string chain_name;
+        std::string rule;  
     };
 };
 #endif

@@ -13,15 +13,17 @@ namespace XTables
     {
     public:
         typedef int RuleID;
-        Chain(std::string name);
+        Chain(std::string name, std::string table_name, bool should_create = true);
         ~Chain();
-        RuleID addRules(std::string rule, std::string type = "-A");
+        RuleID addRule(std::string rule, std::string type = "-A");
         void removeRule(RuleID id);
         std::string getName();
     private:
-       std::string name;
-       std::map<RuleID, std::unique_ptr<XTables::ChainRule>> package_rules;
-       std::mutex package_rules_mutex;
+        bool created;
+        std::string table_name;
+        std::string name;
+        std::map<RuleID, std::unique_ptr<XTables::ChainRule>> package_rules;
+        std::mutex package_rules_mutex;
     };
 };
 
