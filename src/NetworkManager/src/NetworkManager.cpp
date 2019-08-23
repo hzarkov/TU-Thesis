@@ -142,44 +142,17 @@ std::shared_ptr<InterfaceController> NetworkManager::getInterface(std::string in
     return this->interfaces.at(interfaces_name);
 }
 
-std::shared_ptr<PackageRule> NetworkManager::addPackageRule(std::string rule, std::string type)
-{
-    std::lock_guard<std::mutex> package_rules_mutex_lock(this->package_rules_mutex);
-    std::shared_ptr<PackageRule> result;
-    std::remove_if(this->package_rules.begin(),this->package_rules.end(), [](auto elem){
-        return elem.expired();
-    });
-
-    auto found = std::find_if(this->package_rules.begin(),this->package_rules.end(),[rule](auto elem){
-        auto element = elem.lock();
-        return element->getRule() == rule;
-    });
-
-    if(this->package_rules.end() != found)
-    {
-        result = found->lock();
-    }
-    else
-    {
-        std::shared_ptr<PackageRule> package_rule = std::make_shared<PackageRule>(rule, type);
-        this->package_rules.push_back(package_rule);
-        result = package_rule;
-    }
-    return result;
-}
-
-
-std::shared_ptr<ChainRule> NetworkManager::addChainRule(std::string rule)
+std::shared_ptr<XTables::Chain> NetworkManager::getXTablesChain(std::string name)
 {
     std::lock_guard<std::mutex> chain_rules_mutex_lock(this->chain_rules_mutex);
-    std::shared_ptr<ChainRule> result;
+    std::shared_ptr<XTables::Chain> result;
     std::remove_if(this->chain_rules.begin(),this->chain_rules.end(), [](auto elem){
         return elem.expired();
     });
 
-    auto found = std::find_if(this->chain_rules.begin(),this->chain_rules.end(),[rule](auto elem){
+    auto found = std::find_if(this->chain_rules.begin(),this->chain_rules.end(),[name](auto elem){
         auto element = elem.lock();
-        return element->getRule() == rule;
+        return element->getName() == name;
     });
 
     if(this->chain_rules.end() != found)
@@ -188,7 +161,7 @@ std::shared_ptr<ChainRule> NetworkManager::addChainRule(std::string rule)
     }
     else
     {
-        std::shared_ptr<ChainRule> chain_rule = std::make_shared<ChainRule>(rule);
+        std::shared_ptr<XTables::Chain> chain_rule = std::make_shared<XTables::Chain>(name);
         this->chain_rules.push_back(chain_rule);
         result = chain_rule;
     }

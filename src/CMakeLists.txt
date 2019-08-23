@@ -5,11 +5,12 @@ set(COMPONENTS
         System 
         Interface 
         Route 
-        PackageRule
+        XTables
         DHCPClient 
         DNSMasqController
         DHCPServer
         DLoader
+        InterfaceControllers
         NetworkManager
         FileConfigurators
         InternetSwitchers
