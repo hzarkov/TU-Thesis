@@ -1,12 +1,14 @@
 add_library(ini_reader INTERFACE)
 target_include_directories(ini_reader INTERFACE inih)
-set(COMPONENTS 
-        Logger 
-        System 
-        Interface 
-        Route 
+set(COMPONENTS
+        Logger
+        System
+        Interface
+        Route
+        RouteRule
+        IPSet
         XTables
-        DHCPClient 
+        DHCPClient
         DNSMasqController
         DHCPServer
         DLoader
