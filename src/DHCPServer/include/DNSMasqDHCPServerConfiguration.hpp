@@ -11,10 +11,10 @@
 class DNSMasqDHCPServerConfiguration : public DHCPServerConfiguration
 {
 private:
-    std::shared_ptr<std::mutex> conf_mutex;
     std::shared_ptr<DNSMasqController> dnsmasq_controller;
+    std::shared_ptr<DNSMasqConfiguration> conf;
 public:
-    DNSMasqDHCPServerConfiguration(std::shared_ptr<std::mutex> mutex, std::shared_ptr<DNSMasqController> dnsmasq_controller, std::hash<std::string> hasher, std::string interface_name, std::string ip_range_start, std::string ip_range_end, uint lease);
-    ~DNSMasqDHCPServerConfiguration();  
+    DNSMasqDHCPServerConfiguration(std::shared_ptr<DNSMasqController> dnsmasq_controller, std::string interface_name, std::string ip_range_start, std::string ip_range_end, uint lease);
+    ~DNSMasqDHCPServerConfiguration() = default;
 };
 #endif

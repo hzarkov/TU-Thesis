@@ -9,6 +9,7 @@ set(COMPONENTS
         IPSet
         XTables
         DHCPClient
+        DNSMasqConfiguration
         DNSMasqController
         DHCPServer
         DLoader

@@ -10,9 +10,7 @@
 
 class DHCPServer
 {
-    std::shared_ptr<std::mutex> conf_mutex;
     std::shared_ptr<DNSMasqController> dnsmasq_controller;
-    std::hash<std::string> hasher;
 public:
     DHCPServer(std::shared_ptr<DNSMasqController> dnsmasq_controller);
     ~DHCPServer() = default;
