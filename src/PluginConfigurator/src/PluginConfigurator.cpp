@@ -2,5 +2,6 @@
 
 void PluginConfigurator::addPlugin(std::shared_ptr<Plugin> plugin)
 {
-    this->plugins.push_back(plugin);
+    static uint id = 0;
+    this->plugins[id++] = plugin;
 }

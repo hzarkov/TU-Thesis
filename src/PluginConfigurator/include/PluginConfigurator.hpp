@@ -4,7 +4,7 @@
 #include "Plugin.hpp"
 
 #include <memory>
-#include <vector>
+#include <map>
 
 class PluginConfigurator
 {
@@ -15,6 +15,6 @@ public:
     virtual void stop() = 0;
     virtual ~PluginConfigurator() = default;
 protected:
-    std::vector<std::shared_ptr<Plugin>> plugins;
+    std::map<int, std::shared_ptr<Plugin>> plugins;
 };
 #endif

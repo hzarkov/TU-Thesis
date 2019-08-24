@@ -112,6 +112,7 @@ int main(int argc, char const *argv[])
             ErrorLogger << "Failed to add " << plugin_type << " plug-in because of '" << e.what() << "'" << std::endl;
         }
     }
+    plugin_configurator->start();
     // Wait for stop signal (SIGINT, SIGTERM).
     if (0 != sigwait(&sigSet, &sigStop))
     {
@@ -124,6 +125,7 @@ int main(int argc, char const *argv[])
         case SIGINT:
         case SIGTERM:
             network_manager->stop();
+            plugin_configurator->stop();
             break;
         default:
             ErrorLogger << "Caught unexpected stop signal." << std::endl;

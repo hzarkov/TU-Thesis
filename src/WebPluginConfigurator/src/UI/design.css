@@ -1,0 +1,44 @@
+body{
+    text-align:center;
+}
+
+ul{
+    padding:0px;
+    margin:0px;
+    overflow-x:hidden;
+    white-space:nowrap;
+    height: 2em;
+    width: 100%;
+}
+
+li{
+    padding:0em 1em;
+    display:inline;
+}
+
+a:link{
+    text-decoration: none;
+    color:black;
+}
+
+a:hover{
+    color: blue;
+}
+
+a:active{
+    color: blue;
+}
+
+.center{
+    padding: auto;
+}
+
+.conf{
+    display: block;
+    padding-bottom:1em;
+}
+
+label{
+    padding-right:1em;
+}
+

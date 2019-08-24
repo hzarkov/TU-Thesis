@@ -26,7 +26,8 @@ void INIFileConfigurator::exec()
 {
     INIReader reader(this->file_name);
 
-    if (reader.ParseError() < 0) {
+    if (reader.ParseError() < 0) 
+    {
         throw std::runtime_error("Can't load " + this->file_name);
     }
     std::set<std::string> sections = reader.Sections();
