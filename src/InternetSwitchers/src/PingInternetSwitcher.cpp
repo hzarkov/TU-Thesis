@@ -5,13 +5,13 @@
 #include <chrono>
 
 const std::string PING_ADDRESS = "8.8.8.8";
-PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkManager> nm)
+PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkFactory> nm)
 :Plugin(nm)
 {
     
 }
 
-void PingInternetSwitcher::configure(std::map<std::string, std::string> conf)
+void PingInternetSwitcher::configure(Plugin::Configuration_t conf)
 {
     std::stringstream ss(conf["interfaces"]);
     std::string interface_name;
@@ -28,6 +28,17 @@ void PingInternetSwitcher::configure(std::map<std::string, std::string> conf)
             WarningLogger << "Failed to load " << interface_name << ": " << e.what() << std::endl;
         }
     }
+}
+
+Plugin::Configuration_t PingInternetSwitcher::getConfiguration()
+{
+    Plugin::Configuration_t result;
+    result["interfaces"] = "";
+    for(auto interface : this->interfaces)
+    {
+        result["interfaces"] += interface->getName() + ",";
+    }
+    return result;
 }
 
 void PingInternetSwitcher::exec()
@@ -78,7 +89,7 @@ PingInternetSwitcher::~PingInternetSwitcher()
 
 extern "C"
 {
-    Plugin* allocator(std::shared_ptr<NetworkManager> nm)
+    Plugin* allocator(std::shared_ptr<NetworkFactory> nm)
     {
         return new PingInternetSwitcher(nm);
     }

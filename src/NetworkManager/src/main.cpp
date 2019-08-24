@@ -1,8 +1,9 @@
-#include "NetworkManager.hpp"
+#include "NetworkFactory.hpp"
 #include "Logger.hpp"
 #include "INIReader.h"
 #include "DLoader.hpp"
 #include "Plugin.hpp"
+#include "WebPluginConfigurator.hpp"
 
 #include <memory>
 #include <signal.h>
@@ -60,8 +61,8 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
-    std::shared_ptr<NetworkManager> network_manager = 
-        std::make_shared<NetworkManager>();
+    std::shared_ptr<NetworkFactory> network_manager = 
+        std::make_shared<NetworkFactory>();
     network_manager->start();
 
     INIReader reader(NM_PLUGIN_CONFIGURATION_FILE);
@@ -71,10 +72,13 @@ int main(int argc, char const *argv[])
     }
     std::set<std::string> sections = reader.Sections();
     std::map<std::string,std::shared_ptr<DLoader>> loaded_plugins;
-    std::vector<std::shared_ptr<Plugin>> plugin_instances;
+    //std::vector<std::shared_ptr<Plugin>> plugin_instances;
+    std::shared_ptr<PluginConfigurator> plugin_configurator = std::make_shared<WebPluginConfigurator>();
+
     for (std::set<std::string>::iterator it = sections.begin(); it != sections.end(); ++it)
     {
         std::string plugin_type = *it;
+        InformationLogger << "Loading " << plugin_type << "..." << std::endl;
 
         std::shared_ptr<DLoader> plugin_dl;
         try
@@ -89,17 +93,23 @@ int main(int argc, char const *argv[])
 
         std::shared_ptr<Plugin> plugin = 
             plugin_dl->createInstance<Plugin>(network_manager);
-        plugin_instances.push_back(plugin);
+        //plugin_instances.push_back(plugin);
 
+        InformationLogger << "Loaded " << plugin_type << std::endl;
         auto configuration = getPluginConfiguration(reader, plugin_type);
         try
         {
-            plugin->configure(configuration);
+            InformationLogger << "Starting initial configuration of " << plugin_type << " plugin ..." << std::endl;
+            plugin->config(configuration);
+            InformationLogger << "Executing " << plugin_type << " plugin ..." << std::endl;
             plugin->exec();
+            InformationLogger << "Adding " << plugin_type << " to dynamic plugin configurator..." << std::endl;
+            plugin_configurator->addPlugin(plugin);
+            InformationLogger << "Plug-in " << plugin_type << " was successfully added." << std::endl;
         }
         catch(std::exception& e)
         {
-            ErrorLogger << plugin_type << ": " << e.what() << std::endl;
+            ErrorLogger << "Failed to add " << plugin_type << " plug-in because of '" << e.what() << "'" << std::endl;
         }
     }
     // Wait for stop signal (SIGINT, SIGTERM).

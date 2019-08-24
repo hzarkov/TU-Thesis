@@ -7,11 +7,12 @@
 class RoutingSpecializer : public Plugin
 {
 public:
-    RoutingSpecializer(std::shared_ptr<NetworkManager> nm);  
+    RoutingSpecializer(std::shared_ptr<NetworkFactory> nm);  
     ~RoutingSpecializer() = default;
-    void configure(std::map<std::string, std::string> conf);
+    void configure(Configuration_t conf);
     void exec();
+    Configuration_t getConfiguration();
 private:
-    std::unique_ptr<TrafficSpecialization> traffic_specialization;
+    std::map<std::string, std::shared_ptr<TrafficSpecialization>> traffic_specializations;
 };
 #endif

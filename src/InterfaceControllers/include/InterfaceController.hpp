@@ -9,6 +9,7 @@ public:
     InterfaceController(std::string interface_name);
     virtual ~InterfaceController() = default;
     std::string getGW();
+    std::string getName();
 protected:
     std::unique_ptr<Interface> interface;
 };

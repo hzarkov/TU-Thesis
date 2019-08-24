@@ -1,16 +1,18 @@
 #ifndef TRAFFIC_SPECIALIZATION_HPP
 #define TRAFFIC_SPECIALIZATION_HPP
 
-#include "NetworkManager.hpp"
+#include "NetworkFactory.hpp"
 #include <string>
 #include <memory>
 
 class TrafficSpecialization
 {
 public:
-    TrafficSpecialization(std::shared_ptr<NetworkManager> nm, std::string interface_name);
+    TrafficSpecialization(std::shared_ptr<NetworkFactory> nm, std::string interface_name);
     void addIP(std::string ip);
     void addDomain(std::string domain_name);
+    std::vector<std::string> getIPs();
+    std::vector<std::string> getDomains();
     ~TrafficSpecialization() = default;
 private:
     std::shared_ptr<RouteRule> route_rule;

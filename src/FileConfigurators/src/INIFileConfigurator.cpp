@@ -8,13 +8,18 @@
 
 constexpr uint DEFAULT_DHCP_LEASE=7200;
 
-INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkManager> nm)
+INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkFactory> nm)
 :FileConfigurator(nm)
 {
 
 }
-void INIFileConfigurator::config(std::map<std::string, std::string> conf)
+void INIFileConfigurator::configureFileConfigurator(Plugin::Configuration_t conf)
 {
+}
+
+Plugin::Configuration_t INIFileConfigurator::getFileConfiguratorConfiguration()
+{
+    return Plugin::Configuration_t();
 }
 
 void INIFileConfigurator::exec()
@@ -92,7 +97,7 @@ void INIFileConfigurator::exec()
 
 extern "C"
 {
-    Plugin* allocator(std::shared_ptr<NetworkManager> nm)
+    Plugin* allocator(std::shared_ptr<NetworkFactory> nm)
     {
         return new INIFileConfigurator(nm);
     }

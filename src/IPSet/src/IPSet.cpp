@@ -26,6 +26,12 @@ void IPSet::addIP(std::string ip)
     {
         throw std::runtime_error("Failed to add '" + ip + "' to '" + this->name + "' ipset using: " + cmd);
     }
+    ips.push_back(ip);
+}
+
+std::vector<std::string> IPSet::getIPs()
+{
+    return this->ips;
 }
 
 IPSet::~IPSet()

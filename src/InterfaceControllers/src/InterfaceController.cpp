@@ -10,3 +10,8 @@ std::string InterfaceController::getGW()
 {
     return this->interface->getGW().toString();
 }
+
+std::string InterfaceController::getName()
+{
+    return this->interface->getName();
+}

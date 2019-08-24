@@ -1,18 +1,20 @@
 #include "FileConfigurator.hpp"
 
-FileConfigurator::FileConfigurator(std::shared_ptr<NetworkManager> nm)
+FileConfigurator::FileConfigurator(std::shared_ptr<NetworkFactory> nm)
 :Plugin(nm)
 {
 
 }
 
-std::string FileConfigurator::getFileName()
-{
-    return this->file_name;
-}
-
-void FileConfigurator::configure(std::map<std::string, std::string> conf)
+void FileConfigurator::configure(Plugin::Configuration_t conf)
 {
     this->file_name = conf.at("file");
-    this->config(conf);
+    this->configureFileConfigurator(conf);
+}
+
+Plugin::Configuration_t FileConfigurator::getConfiguration()
+{
+    Plugin::Configuration_t result = this->getFileConfiguratorConfiguration();
+    result["file"] = this->file_name;
+    return result;
 }

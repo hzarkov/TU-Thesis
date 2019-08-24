@@ -1,11 +1,11 @@
-#include "NetworkManager.hpp"
+#include "NetworkFactory.hpp"
 #include "Logger.hpp"
 #include "EthernetController.hpp"
 
 #include <experimental/filesystem>
 #include <chrono>
 
-NetworkManager::NetworkManager()
+NetworkFactory::NetworkFactory()
 :dnsmasq_controller(std::make_shared<DNSMasqController>()),
 dhcp_server(std::make_shared<DHCPServer>(dnsmasq_controller))
 {
@@ -14,28 +14,28 @@ dhcp_server(std::make_shared<DHCPServer>(dnsmasq_controller))
     this->xtables["mangle"] = std::make_shared<XTables::Table>("mangle");
 }
 
-NetworkManager::~NetworkManager()
+NetworkFactory::~NetworkFactory()
 {
 
 }
 
-void NetworkManager::start()
+void NetworkFactory::start()
 {
     /*this->checker_running = true;
-    this->checker_thread = std::thread(&NetworkManager::checkerThread, this);
+    this->checker_thread = std::thread(&NetworkFactory::checkerThread, this);
     std::unique_lock<std::mutex> lk(checker_thread_start_mutex);
     checker_thread_start_cond.wait(lk);*/
     this->checkerThread();
 }
 
-void NetworkManager::stop()
+void NetworkFactory::stop()
 {
     /*this->checker_running = false;
     this->checker_thread_timer_cond.notify_one();
     this->checker_thread.join();*/
 }
 
-void NetworkManager::checkerThread()
+void NetworkFactory::checkerThread()
 {
     //bool notify_start = false;
     //while(this->checker_running) // for now use only on start
@@ -86,7 +86,7 @@ void NetworkManager::checkerThread()
     //}
 }
 
-std::vector<std::string> NetworkManager::getSystemInterfacesList()
+std::vector<std::string> NetworkFactory::getSystemInterfacesList()
 {
     std::vector<std::string> result;
     std::string interfaces_path = "/sys/class/net";
@@ -98,7 +98,7 @@ std::vector<std::string> NetworkManager::getSystemInterfacesList()
     return result;
 }
 
-void NetworkManager::addInterface(std::string interface_name) // add callback for in case of removal
+void NetworkFactory::addInterface(std::string interface_name) // add callback for in case of removal
 {
     std::string interface_type = interface_name.substr(0,2);
     if(interface_type == "en" || interface_type == "et" || interface_type == "us")
@@ -112,13 +112,13 @@ void NetworkManager::addInterface(std::string interface_name) // add callback fo
     }
 }
 
-std::shared_ptr<InterfaceController> NetworkManager::getInterface(std::string interfaces_name)
+std::shared_ptr<InterfaceController> NetworkFactory::getInterface(std::string interfaces_name)
 {
     std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
     return this->interfaces.at(interfaces_name);
 }
 
-std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric, std::string table)
+std::shared_ptr<Route> NetworkFactory::addRoute(std::string destination, std::string gateway, std::string interface_name, int metric, std::string table)
 {
     std::lock_guard<std::mutex> routes_mutex_lock(this->routes_mutex);
     std::shared_ptr<Route> result;
@@ -130,7 +130,7 @@ std::shared_ptr<Route> NetworkManager::addRoute(std::string destination, std::st
     return result;
 }
 
-std::shared_ptr<RouteRule> NetworkManager::getRouteRule(uint priority, uint lookup, std::string additional_data)
+std::shared_ptr<RouteRule> NetworkFactory::getRouteRule(uint priority, uint lookup, std::string additional_data)
 {
     std::lock_guard<std::mutex> route_rules_mutex_lock(this->route_rules_mutex);
     std::shared_ptr<RouteRule> result;
@@ -142,7 +142,7 @@ std::shared_ptr<RouteRule> NetworkManager::getRouteRule(uint priority, uint look
     return result;
 }
 
-std::shared_ptr<IPSet> NetworkManager::getIPSet(std::string name, std::string type)
+std::shared_ptr<IPSet> NetworkFactory::getIPSet(std::string name, std::string type)
 {
     std::lock_guard<std::mutex> ipsets_mutex_lock(this->ipsets_mutex);
     std::shared_ptr<IPSet> result;
@@ -154,13 +154,13 @@ std::shared_ptr<IPSet> NetworkManager::getIPSet(std::string name, std::string ty
     return result;
 }
 
-std::shared_ptr<XTables::Table> NetworkManager::getXTable(std::string name)
+std::shared_ptr<XTables::Table> NetworkFactory::getXTable(std::string name)
 {
     return this->xtables.at(name);
 }
 
 template<typename T, typename Array_t, typename ...Args>
-std::shared_ptr<T> NetworkManager::getWeakElement(Array_t array, std::function<bool (std::weak_ptr<T> elem)> find_function, Args... args)
+std::shared_ptr<T> NetworkFactory::getWeakElement(Array_t array, std::function<bool (std::weak_ptr<T> elem)> find_function, Args... args)
 {
     std::shared_ptr<T> result;
     std::remove_if(array.begin(),array.end(), [](auto elem){

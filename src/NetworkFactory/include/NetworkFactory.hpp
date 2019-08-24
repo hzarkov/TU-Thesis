@@ -1,5 +1,5 @@
-#ifndef NETWORK_MANAGER_HPP
-#define NETWORK_MANAGER_HPP
+#ifndef NETWORK_FACTORY_HPP
+#define NETWORK_FACTORY_HPP
 #include "InterfaceController.hpp"
 #include "Route.hpp"
 #include "Table.hpp"
@@ -16,11 +16,11 @@
 #include <mutex>
 #include <condition_variable>
 
-class NetworkManager
+class NetworkFactory
 {    
 public:
-    NetworkManager();
-    ~NetworkManager();
+    NetworkFactory();
+    ~NetworkFactory();
     void start();
     void stop();
     std::shared_ptr<InterfaceController> getInterface(std::string interface_name);

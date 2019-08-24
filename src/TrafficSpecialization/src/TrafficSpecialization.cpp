@@ -1,9 +1,18 @@
 #include "TrafficSpecialization.hpp"
+#include <stdexcept>
 
 const std::string ipset_name_extension = "_ipset";
-TrafficSpecialization::TrafficSpecialization(std::shared_ptr<NetworkManager> nm, std::string interface_name)
+TrafficSpecialization::TrafficSpecialization(std::shared_ptr<NetworkFactory> nm, std::string interface_name)
 {
-    std::shared_ptr<InterfaceController> interface = nm->getInterface(interface_name);
+    std::shared_ptr<InterfaceController> interface;
+    try
+    {
+        interface = nm->getInterface(interface_name);
+    }
+    catch(std::out_of_range& e)
+    {
+        throw std::invalid_argument("Unknown '" + interface_name + "' interface.");
+    }
     static int mark = 0;
     mark++;
     uint routing_table_id = 100+mark;
@@ -29,4 +38,15 @@ void TrafficSpecialization::addIP(std::string ip)
 void TrafficSpecialization::addDomain(std::string domain_name)
 {
 
+}
+
+std::vector<std::string> TrafficSpecialization::getIPs()
+{
+    return this->ipset->getIPs();
+}
+
+std::vector<std::string> TrafficSpecialization::getDomains()
+{
+    std::vector<std::string> result;
+    return result;
 }

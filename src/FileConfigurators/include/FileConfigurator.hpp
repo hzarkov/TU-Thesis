@@ -5,14 +5,15 @@
 #include <string>
 class FileConfigurator : public Plugin
 {
-protected:
-    std::string file_name;
 public:
     virtual ~FileConfigurator() = default;
-    FileConfigurator(std::shared_ptr<NetworkManager> nm);
-    void configure(std::map<std::string, std::string> conf);
-    virtual void config(std::map<std::string, std::string> conf) = 0;
-    std::string getFileName();
+    FileConfigurator(std::shared_ptr<NetworkFactory> nm);
+    void configure(Configuration_t conf);
+    virtual void configureFileConfigurator(Configuration_t conf) = 0;
+    virtual Configuration_t getFileConfiguratorConfiguration() = 0;
+    Configuration_t getConfiguration();
+protected:
+    std::string file_name;
 };
 
 #endif

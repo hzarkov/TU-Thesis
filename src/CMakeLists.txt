@@ -14,6 +14,10 @@ set(COMPONENTS
         DHCPServer
         DLoader
         InterfaceControllers
+        NetworkFactory
+        Plugin
+        PluginConfigurator
+        WebPluginConfigurator
         NetworkManager
         FileConfigurators
         InternetSwitchers

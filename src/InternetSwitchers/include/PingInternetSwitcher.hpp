@@ -13,10 +13,11 @@
 class PingInternetSwitcher : public Plugin
 {
 public:
-    PingInternetSwitcher(std::shared_ptr<NetworkManager> nm);
+    PingInternetSwitcher(std::shared_ptr<NetworkFactory> nm);
     ~PingInternetSwitcher();
-    void configure(std::map<std::string, std::string> conf);
+    void configure(Configuration_t conf);
     void exec();
+    Configuration_t getConfiguration();
 private:
     void Run();
 

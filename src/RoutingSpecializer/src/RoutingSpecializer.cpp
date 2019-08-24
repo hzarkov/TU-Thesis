@@ -1,26 +1,37 @@
 #include "RoutingSpecializer.hpp"
 #include "Logger.hpp"
 
-RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkManager> nm)
+RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkFactory> nm)
 :Plugin(nm)
 {
    
 }
 
-void RoutingSpecializer::configure(std::map<std::string, std::string> conf)
+void RoutingSpecializer::configure(Plugin::Configuration_t conf)
 {
     for(auto configuration : conf)
     {
-        this->traffic_specialization = std::make_unique<TrafficSpecialization>(this->network_manager, configuration.first);
-        std::stringstream ss(configuration.second);
-        std::string route;
-        while (std::getline(ss, route, ',')) 
+        std::string interface_name = configuration.first;
+        std::shared_ptr<TrafficSpecialization> traffic_specialization;
+        try
         {
-            if(1) //ToDo: Check if route is IP or domain
+            traffic_specialization = this->traffic_specializations.at(interface_name);
+        }
+        catch(std::exception& e)
+        {
+            traffic_specialization = std::make_shared<TrafficSpecialization>(this->network_manager, interface_name);
+            this->traffic_specializations[interface_name] = traffic_specialization;
+        }
+
+        std::stringstream ss(configuration.second);
+        std::string destination;
+        while (std::getline(ss, destination, ',')) 
+        {
+            if(1) //ToDo: Check if destination is IP or domain
             {
                 try
                 {
-                    this->traffic_specialization->addIP(route);
+                    traffic_specialization->addIP(destination);
                 }
                 catch(std::exception& e)
                 {
@@ -29,14 +40,27 @@ void RoutingSpecializer::configure(std::map<std::string, std::string> conf)
             }
             else if(1)
             {
-                this->traffic_specialization->addDomain(route);
+                traffic_specialization->addDomain(destination);
             }
             else
             {
-                 WarningLogger << "Unknown domain type of '" + route << "'" << std::endl;
+                 WarningLogger << "Unknown domain type of '" + destination << "'" << std::endl;
             } 
         }
     }   
+}
+
+Plugin::Configuration_t RoutingSpecializer::getConfiguration()
+{
+    Plugin::Configuration_t result;
+    for(auto traffic_specialization : this->traffic_specializations)
+    {
+        result[traffic_specialization.first] = "";
+        for(auto ip : traffic_specialization.second->getIPs())
+        {
+            result[traffic_specialization.first] += ip + ",";
+        }
+    }
 }
 
 void RoutingSpecializer::exec()
@@ -46,7 +70,7 @@ void RoutingSpecializer::exec()
 
 extern "C"
 {
-    Plugin* allocator(std::shared_ptr<NetworkManager> nm)
+    Plugin* allocator(std::shared_ptr<NetworkFactory> nm)
     {
         return new RoutingSpecializer(nm);
     }
