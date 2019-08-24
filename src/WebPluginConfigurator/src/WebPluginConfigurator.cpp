@@ -251,7 +251,7 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
         {
             std::shared_ptr<Plugin> plugin = this->plugins.at(plugin_id);
             Plugin::Configuration_t plugin_conf = plugin->getConfiguration();
-            configuration += "<form action=\"/?plugin=" + std::to_string(plugin_id) + "\" method=\"POST\">";
+            configuration += "<form enctype=\"text/plain\" action=\"/?plugin=" + std::to_string(plugin_id) + "\" method=\"POST\">";
             for(auto conf : plugin_conf)
             {
                 configuration += "<div class=\"conf\"><label>" + conf.first + "</label><input type=\"text\" name=\"" + conf.first + "\" value=\"" + conf.second + "\"></div>";
@@ -291,7 +291,7 @@ void WebPluginConfigurator::answerToRequest(int client_socket, WebPluginConfigur
             if(std::string::npos != plugin_id)
             {
                 std::shared_ptr<Plugin> plugin = this->plugins.at(plugin_id);
-                //plugin->configure(request.data);
+                plugin->configure(request.data);
             }
         }
         catch(std::invalid_argument& e)
@@ -302,6 +302,10 @@ void WebPluginConfigurator::answerToRequest(int client_socket, WebPluginConfigur
         catch(std::out_of_range& e)
         {
             ErrorLogger << "Incorrect plugin id(" << plugin_id << "). Someone is doing something nasty!" << std::endl;
+        }
+        catch(std::exception& e)
+        {
+            ErrorLogger << "Failed to configure plugin " << plugin_id << " because of '" << e.what() << "'." << std::endl;
         }
     }
     std::string indexHTML = this->generateHTMLMessage(request);

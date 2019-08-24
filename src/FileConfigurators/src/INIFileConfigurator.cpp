@@ -15,6 +15,7 @@ INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkFactory> nm)
 }
 void INIFileConfigurator::configureFileConfigurator(Plugin::Configuration_t conf)
 {
+    this->exec();
 }
 
 Plugin::Configuration_t INIFileConfigurator::getFileConfiguratorConfiguration()

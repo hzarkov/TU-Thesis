@@ -21,7 +21,10 @@ void PingInternetSwitcher::configure(Plugin::Configuration_t conf)
         try
         {
             interface = this->network_manager->getInterface(interface_name);
-            this->interfaces.push_back(interface);
+            {
+                std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
+                this->interfaces.push_back(interface);
+            }
         }
         catch(std::exception& e)
         {
@@ -32,6 +35,7 @@ void PingInternetSwitcher::configure(Plugin::Configuration_t conf)
 
 Plugin::Configuration_t PingInternetSwitcher::getConfiguration()
 {
+    std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
     Plugin::Configuration_t result;
     result["interfaces"] = "";
     for(auto interface : this->interfaces)
@@ -56,7 +60,12 @@ void PingInternetSwitcher::Run()
     std::shared_ptr<Route> default_gw;
     while(this->running)
     {
-        for(auto interface: this->interfaces)
+        std::vector<std::shared_ptr<InterfaceController>> interfaces_copy;
+        {
+            std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
+            interfaces_copy = this->interfaces;     
+        } 
+        for(auto interface: interfaces_copy)
         {
             try
             {

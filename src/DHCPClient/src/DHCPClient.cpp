@@ -30,7 +30,7 @@ void DHCPClient::run()
 }
 
 DHCPClient::DHCPClient(std::string interface)
-:interface(interface)
+:interface(interface),running(false)
 {
 
 }

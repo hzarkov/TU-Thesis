@@ -28,5 +28,6 @@ private:
     std::mutex thread_block_mutex;
 
     std::vector<std::shared_ptr<InterfaceController>> interfaces;
+    std::mutex interfaces_mutex;
 };
 #endif
