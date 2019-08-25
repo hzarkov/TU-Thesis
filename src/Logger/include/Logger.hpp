@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <mutex>
+
+static std::mutex print_mutex;
 #define DebugLogger Logger("Debug", __FILE__, __FUNCTION__, __LINE__)
 #define InformationLogger Logger("Information", __FILE__, __FUNCTION__, __LINE__)
 #define WarningLogger Logger("Warning", __FILE__, __FUNCTION__, __LINE__)

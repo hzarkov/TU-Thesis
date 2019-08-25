@@ -61,6 +61,7 @@ Plugin::Configuration_t RoutingSpecializer::getConfiguration()
             result[traffic_specialization.first] += ip + ",";
         }
     }
+    return result;
 }
 
 void RoutingSpecializer::exec()

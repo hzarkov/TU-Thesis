@@ -20,7 +20,8 @@ void INIFileConfigurator::configureFileConfigurator(Plugin::Configuration_t conf
 
 Plugin::Configuration_t INIFileConfigurator::getFileConfiguratorConfiguration()
 {
-    return Plugin::Configuration_t();
+    Plugin::Configuration_t result;
+    return result;
 }
 
 void INIFileConfigurator::exec()

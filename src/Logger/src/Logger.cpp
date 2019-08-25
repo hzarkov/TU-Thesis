@@ -1,8 +1,8 @@
 #include "Logger.hpp"
 #include <ctime>
-#include <mutex>
 
-static std::mutex print_mutex; //ToDo: I am not sure that this is good solution to synchronize logs, but it works for now. Would be problem if need to sync logs from multiple processes.
+
+//std::mutex Logger::print_mutex; //ToDo: I am not sure that this is good solution to synchronize logs, but it works for now. Would be problem if need to sync logs from multiple processes.
 
 Logger::Logger(std::string name, const char* file_name, const char* function, int line)
 {

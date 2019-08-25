@@ -1,5 +1,5 @@
-#include "NetworkFactory.hpp"
 #include "Logger.hpp"
+#include "NetworkFactory.hpp"
 #include "INIReader.h"
 #include "DLoader.hpp"
 #include "Plugin.hpp"
@@ -61,9 +61,9 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
-    std::shared_ptr<NetworkFactory> network_manager = 
+    std::shared_ptr<NetworkFactory> network_factory = 
         std::make_shared<NetworkFactory>();
-    network_manager->start();
+    network_factory->start();
 
     INIReader reader(NM_PLUGIN_CONFIGURATION_FILE);
 
@@ -92,7 +92,7 @@ int main(int argc, char const *argv[])
         }
 
         std::shared_ptr<Plugin> plugin = 
-            plugin_dl->createInstance<Plugin>(network_manager);
+            plugin_dl->createInstance<Plugin>(network_factory);
         //plugin_instances.push_back(plugin);
 
         InformationLogger << "Loaded " << plugin_type << std::endl;
@@ -124,7 +124,7 @@ int main(int argc, char const *argv[])
     {
         case SIGINT:
         case SIGTERM:
-            network_manager->stop();
+            network_factory->stop();
             plugin_configurator->stop();
             break;
         default:

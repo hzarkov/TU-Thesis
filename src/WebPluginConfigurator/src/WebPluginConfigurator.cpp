@@ -80,8 +80,7 @@ void WebPluginConfigurator::AccpetingThread()
             continue;
         }
         DebugLogger << "Client accepted." << std::endl;
-        std::lock_guard<std::mutex> client_threads_mutex_lock(this->client_threads_mutex);
-        this->client_threads.push_back(std::thread(&WebPluginConfigurator::ClientThread, this, client_socket));
+        std::thread(&WebPluginConfigurator::ClientThread, this, client_socket).detach();
     }
 }
 
@@ -325,10 +324,9 @@ void WebPluginConfigurator::ClientThread(int client_socket)
 WebPluginConfigurator::~WebPluginConfigurator()
 {
     DebugLogger << __PRETTY_FUNCTION__ << std::endl;
-    /*for(auto clinet_thread : this->client_threads)
-    {
-        //tell the thread to exit.
-        clinet_thread.join();
-    }*/
+
     close(this->server_socket);
+    //might need to add mutex to combine both functions
+    this->accept_new_clients = false;
+    this->accept_clients_thread.join();
 }

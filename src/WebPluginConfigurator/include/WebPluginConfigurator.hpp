@@ -41,7 +41,5 @@ private:
     std::thread accept_clients_thread;
     bool accept_new_clients;
 
-    std::mutex client_threads_mutex;
-    std::vector<std::thread> client_threads;
 };
 #endif
