@@ -15,17 +15,6 @@ INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkFactory> nm)
 }
 void INIFileConfigurator::configureFileConfigurator(Plugin::Configuration_t conf)
 {
-    this->exec();
-}
-
-Plugin::Configuration_t INIFileConfigurator::getFileConfiguratorConfiguration()
-{
-    Plugin::Configuration_t result;
-    return result;
-}
-
-void INIFileConfigurator::exec()
-{
     INIReader reader(this->file_name);
 
     if (reader.ParseError() < 0) 
@@ -95,7 +84,18 @@ void INIFileConfigurator::exec()
         {
             ErrorLogger << "Unknown " << interface_type << " type for " << interface_name << std::endl;
         }
-    }    
+    }   
+}
+
+Plugin::Configuration_t INIFileConfigurator::getFileConfiguratorConfiguration()
+{
+    Plugin::Configuration_t result;
+    return result;
+}
+
+void INIFileConfigurator::exec()
+{
+     
 }
 
 extern "C"
