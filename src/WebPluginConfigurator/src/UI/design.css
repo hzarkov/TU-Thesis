@@ -5,7 +5,7 @@ body{
 }
 div#header{
     background-image: linear-gradient(to bottom, grey, blue);
-    height: 20vh;
+    height: 10vh;
     padding:0px;
     margin:0px;
     border:none;
@@ -19,7 +19,7 @@ div#header>h1{
 }
 div#content{
     border-top:10px solid darkblue;
-    height:80vh;
+    height:90vh;
     padding:0px;
     margin:0px;
     background-color:grey;

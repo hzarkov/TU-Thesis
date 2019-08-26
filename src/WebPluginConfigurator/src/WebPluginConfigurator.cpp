@@ -272,7 +272,7 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
     return html_string;
 }
 
-void WebPluginConfigurator::answerToRequest(int client_socket, WebPluginConfigurator::Request& request)
+std::string WebPluginConfigurator::processRequest(int client_socket, WebPluginConfigurator::Request& request)
 {
     DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::string type = request.header["Type"];
@@ -310,8 +310,7 @@ void WebPluginConfigurator::answerToRequest(int client_socket, WebPluginConfigur
             ErrorLogger << "Failed to configure plugin " << plugin_id << " because of '" << e.what() << "'." << std::endl;
         }
     }
-    std::string indexHTML = this->generateHTMLMessage(request);
-    this->sendMessage(client_socket, "text/html", indexHTML);
+    return this->generateHTMLMessage(request);
 }
 
 void WebPluginConfigurator::ClientThread(int client_socket)
@@ -320,7 +319,9 @@ void WebPluginConfigurator::ClientThread(int client_socket)
     DebugLogger << "Reading client request." << std::endl;
     WebPluginConfigurator::Request request = this->readRequest(client_socket);
 
-    this->answerToRequest(client_socket, request);
+    response = this->processRequest(client_socket, request);
+
+    this->sendMessage(client_socket, "text/html", response);
     close(client_socket);
 }
 

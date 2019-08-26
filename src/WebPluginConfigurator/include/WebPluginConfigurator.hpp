@@ -28,7 +28,7 @@ private:
     Data_t parseData(std::string& request);
     Request readRequest(int client_socket);
     void sendMessage(int client_socket, std::string content_type, std::string& message);
-    void answerToRequest(int client_socket, Request& request);
+    std::string processRequest(int client_socket, Request& request);
     size_t getPluginIdOfRequest(Request& request);
     std::string generateHTMLMessage(Request& request);
 

@@ -2,6 +2,7 @@
 #define WIRELESS_CONTROLLER_HPP
 
 #include "InterfaceController.hpp"
+#include "HotSpotController.hpp"
 
 class WirelessController: public InterfaceController
 {
@@ -13,10 +14,13 @@ public:
         std::string pass;
     } WirelessNetwork;
 
-    WirelessController();
+    WirelessController(std::string interface_name);
     void connectTo(WirelessNetwork network);
     void disconnect();
     void setupHotSpot(std::string name, std::string password);
     std::vector<WirelessNetwork> getAvailableNetworks();
+private:
+    WirelessNetwork network;
+    HotSpotController hotspot_controller;
 };
 #endif
