@@ -237,8 +237,8 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
     for(auto plugin: this->plugins)
     {
         std::string plugin_id_s = std::to_string(plugin.first);
-        std::string plugin_name = plugin_id_s;
-        menu += "<a href=\"/?plugin=" + plugin_id_s + "\"><li>Plugin " + plugin_name + "</li></a>";
+        std::string plugin_name = plugin.second->getName();
+        menu += "<a href=\"/?plugin=" + plugin_id_s + "\"><li>" + plugin_name + "</li></a>";
     }
     menu += "</ul>";
     html_string = std::regex_replace(html_string, std::regex("\\$MENU"), menu);
@@ -251,7 +251,7 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
         {
             std::shared_ptr<Plugin> plugin = this->plugins.at(plugin_id);
             Plugin::Configuration_t plugin_conf = plugin->getConfiguration();
-            std::string plugin_name = "Plugin " + std::to_string(plugin_id);
+            std::string plugin_name = plugin->getName();
             html_string = std::regex_replace(html_string, std::regex("\\$PLUGIN_NAME"), plugin_name);
             configuration += "<form enctype=\"text/plain\" action=\"/?plugin=" + std::to_string(plugin_id) + "\" method=\"POST\">";
             for(auto conf : plugin_conf)
@@ -319,7 +319,7 @@ void WebPluginConfigurator::ClientThread(int client_socket)
     DebugLogger << "Reading client request." << std::endl;
     WebPluginConfigurator::Request request = this->readRequest(client_socket);
 
-    response = this->processRequest(client_socket, request);
+    std::string response = this->processRequest(client_socket, request);
 
     this->sendMessage(client_socket, "text/html", response);
     close(client_socket);

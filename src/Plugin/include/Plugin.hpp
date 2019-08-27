@@ -3,22 +3,24 @@
 
 #include "NetworkFactory.hpp"
 #include <memory>
+#include <map>
+#include <string>
 
 class Plugin
 {
 public:
     typedef std::map<std::string, std::string> Configuration_t;
     
-    Plugin(std::shared_ptr<NetworkFactory> network_manager);
-    void config(Configuration_t configuration);
-    Configuration_t getConfFields();
+    Plugin(std::string name, std::shared_ptr<NetworkFactory> network_manager);
 
     virtual ~Plugin() = default;
     virtual void exec() = 0;
     virtual void configure(Configuration_t configuration) = 0;
     virtual Configuration_t getConfiguration() = 0;
+    std::string getName();
 protected:
     std::shared_ptr<NetworkFactory> network_manager;
+    std::string name;
 };
 
 extern "C"

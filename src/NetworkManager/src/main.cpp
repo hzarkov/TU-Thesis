@@ -100,7 +100,7 @@ int main(int argc, char const *argv[])
         try
         {
             InformationLogger << "Starting initial configuration of " << plugin_type << " plugin ..." << std::endl;
-            plugin->config(configuration);
+            plugin->configure(configuration);
             InformationLogger << "Executing " << plugin_type << " plugin ..." << std::endl;
             plugin->exec();
             InformationLogger << "Adding " << plugin_type << " to dynamic plugin configurator..." << std::endl;

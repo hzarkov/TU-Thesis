@@ -1,20 +1,15 @@
 #include "Plugin.hpp"
 #include "Logger.hpp"
 
-Plugin::Plugin(std::shared_ptr<NetworkFactory> nm)
-:network_manager(nm)
+Plugin::Plugin(std::string name, std::shared_ptr<NetworkFactory> nm)
+:name(name), network_manager(nm)
 {
     
 }
 
-void Plugin::config(Plugin::Configuration_t configuration)
+std::string Plugin::getName()
 {
-    this->configure(configuration);
-}
-
-Plugin::Configuration_t Plugin::getConfFields()
-{
-    return this->getConfiguration();
+    return this->name;
 }
 
 extern "C"

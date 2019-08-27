@@ -2,7 +2,7 @@
 #include "Logger.hpp"
 
 RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkFactory> nm)
-:Plugin(nm)
+:Plugin("Routing Specializer", nm)
 {
    
 }
