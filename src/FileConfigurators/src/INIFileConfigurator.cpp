@@ -9,7 +9,7 @@
 constexpr uint DEFAULT_DHCP_LEASE=7200;
 
 INIFileConfigurator::INIFileConfigurator(std::shared_ptr<NetworkFactory> nm)
-:FileConfigurator(nm)
+:FileConfigurator("INI File Configurator", nm)
 {
 
 }

@@ -7,7 +7,7 @@ class FileConfigurator : public Plugin
 {
 public:
     virtual ~FileConfigurator() = default;
-    FileConfigurator(std::shared_ptr<NetworkFactory> nm);
+    FileConfigurator(std::string name, std::shared_ptr<NetworkFactory> nm);
     void configure(Configuration_t conf);
     virtual void configureFileConfigurator(Configuration_t conf) = 0;
     virtual Configuration_t getFileConfiguratorConfiguration() = 0;

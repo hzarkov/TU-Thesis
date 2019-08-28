@@ -101,7 +101,7 @@ std::vector<std::string> NetworkFactory::getSystemInterfacesList()
 void NetworkFactory::addInterface(std::string interface_name) // add callback for in case of removal
 {
     std::string interface_type = interface_name.substr(0,2);
-    if(interface_type == "en" || interface_type == "et" || interface_type == "us")
+    if(interface_type == "en" || interface_type == "et" || interface_type == "us" || interface_type == "lo")
     {
         std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
         this->interfaces[interface_name] = std::make_shared<EthernetController>(interface_name, dhcp_server);

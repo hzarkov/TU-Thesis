@@ -27,7 +27,7 @@ private:
     std::condition_variable thread_block;
     std::mutex thread_block_mutex;
 
-    std::vector<std::shared_ptr<InterfaceController>> interfaces;
+    std::vector<std::string> interfaces;
     std::mutex interfaces_mutex;
 };
 #endif

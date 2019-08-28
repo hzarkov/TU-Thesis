@@ -1,7 +1,7 @@
 #include "FileConfigurator.hpp"
 
-FileConfigurator::FileConfigurator(std::shared_ptr<NetworkFactory> nm)
-:Plugin(nm)
+FileConfigurator::FileConfigurator(std::string name, std::shared_ptr<NetworkFactory> nm)
+:Plugin(name, nm)
 {
 
 }

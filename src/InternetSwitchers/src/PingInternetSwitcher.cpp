@@ -6,7 +6,7 @@
 
 const std::string PING_ADDRESS = "8.8.8.8";
 PingInternetSwitcher::PingInternetSwitcher(std::shared_ptr<NetworkFactory> nm)
-:Plugin(nm)
+:Plugin("Ping Internet Switcher",nm)
 {
     
 }
@@ -17,13 +17,11 @@ void PingInternetSwitcher::configure(Plugin::Configuration_t conf)
     std::string interface_name;
     while (std::getline(ss, interface_name, ',')) 
     {
-        std::shared_ptr<InterfaceController> interface;
         try
         {
-            interface = this->network_manager->getInterface(interface_name);
             {
                 std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
-                this->interfaces.push_back(interface);
+                this->interfaces.push_back(interface_name);
             }
         }
         catch(std::exception& e)
@@ -38,9 +36,9 @@ Plugin::Configuration_t PingInternetSwitcher::getConfiguration()
     std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
     Plugin::Configuration_t result;
     result["interfaces"] = "";
-    for(auto interface : this->interfaces)
+    for(auto interface_name : this->interfaces)
     {
-        result["interfaces"] += interface->getName() + ",";
+        result["interfaces"] += interface_name + ",";
     }
     return result;
 }
@@ -60,24 +58,26 @@ void PingInternetSwitcher::Run()
     std::shared_ptr<Route> default_gw;
     while(this->running)
     {
-        std::vector<std::shared_ptr<InterfaceController>> interfaces_copy;
+        std::vector<std::string> interfaces_copy;
         {
             std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
             interfaces_copy = this->interfaces;     
         } 
-        for(auto interface: interfaces_copy)
+        for(auto interface_name: interfaces_copy)
         {
             try
             {
+                std::shared_ptr<InterfaceController> interface = this->network_manager->getInterface(interface_name);
                 std::shared_ptr<Route> route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
                 if(0 == System::call("ping -c " + PING_ADDRESS))
                 {
                     default_gw = this->network_manager->addRoute("0.0.0.0/0", interface->getGW());
+                    break;
                 }
             }
             catch(std::exception& e)
             {
-                WarningLogger << "Failed to check internet connection of " << interface << ": " << e.what() << std::endl;
+                WarningLogger << "Failed to check internet connection of " << interface_name << ": " << e.what() << std::endl;
             }
         }
         std::unique_lock<std::mutex> lk(this->thread_block_mutex);
