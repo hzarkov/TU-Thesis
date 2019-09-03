@@ -22,7 +22,7 @@ namespace XTables
         bool created;
         std::string table_name;
         std::string name;
-        std::map<RuleID, std::unique_ptr<XTables::ChainRule>> package_rules;
+        std::map<RuleID, std::shared_ptr<XTables::ChainRule>> package_rules;
         std::mutex package_rules_mutex;
     };
 };

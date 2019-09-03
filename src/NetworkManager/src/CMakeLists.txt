@@ -3,4 +3,4 @@ target_link_libraries(network-manager PRIVATE ini_reader network_factory dloader
 #target_include_directories(network-manager PRIVATE ../include/)
 
 install(TARGETS network-manager DESTINATION ${PROJECT_BINARY_DIR}/output/bin/)
-install(FILES nmPluginConfiguration.ini configuration.ini DESTINATION ${PROJECT_BINARY_DIR}/output/config/)
+install(FILES nmPluginConfiguration.ini DESTINATION ${PROJECT_BINARY_DIR}/output/config/)

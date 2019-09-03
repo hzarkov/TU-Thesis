@@ -23,6 +23,8 @@ public:
     ~NetworkFactory();
     void start();
     void stop();
+
+    std::shared_ptr<DNSMasqController> getDNSMasqController();
     std::shared_ptr<InterfaceController> getInterface(std::string interface_name);
     std::shared_ptr<Route> addRoute(std::string destination, std::string gateway="0.0.0.0", std::string interface_name="", int metric=0, std::string table="");
     std::shared_ptr<XTables::Table> getXTable(std::string name);

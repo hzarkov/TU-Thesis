@@ -2,8 +2,9 @@
 #include "Logger.hpp"
 #include "EthernetController.hpp"
 
-#include <experimental/filesystem>
 #include <chrono>
+#include <algorithm>
+#include <dirent.h>
 
 NetworkFactory::NetworkFactory()
 :dnsmasq_controller(std::make_shared<DNSMasqController>()),
@@ -90,11 +91,18 @@ std::vector<std::string> NetworkFactory::getSystemInterfacesList()
 {
     std::vector<std::string> result;
     std::string interfaces_path = "/sys/class/net";
-    for (const auto & interface : std::experimental::filesystem::directory_iterator(interfaces_path))
-    {
-        std::string interface_name = interface.path().filename();
-        result.push_back(interface_name);
+    struct dirent *entry = nullptr;
+    DIR *dp = nullptr;
+    dp = opendir(interfaces_path.c_str());
+    if (dp != nullptr) {
+        while ((entry = readdir(dp)))
+        {
+            DebugLogger << "Interface name from file: " << entry->d_name << std::endl;
+            result.push_back(entry->d_name);
+        }
     }
+
+    closedir(dp);
     return result;
 }
 
@@ -112,6 +120,11 @@ void NetworkFactory::addInterface(std::string interface_name) // add callback fo
     }
 }
 
+std::shared_ptr<DNSMasqController> NetworkFactory::getDNSMasqController()
+{
+    return this->dnsmasq_controller;
+}
+
 std::shared_ptr<InterfaceController> NetworkFactory::getInterface(std::string interfaces_name)
 {
     std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
@@ -122,7 +135,7 @@ std::shared_ptr<Route> NetworkFactory::addRoute(std::string destination, std::st
 {
     std::lock_guard<std::mutex> routes_mutex_lock(this->routes_mutex);
     std::shared_ptr<Route> result;
-    auto find_function = [destination, metric, table](auto elem){
+    auto find_function = [destination, metric, table](std::weak_ptr<Route> elem){
          auto element = elem.lock();
         return element->getDestination() == destination && element->getMetric() == metric && element->getTable() == table;
     };
@@ -134,7 +147,7 @@ std::shared_ptr<RouteRule> NetworkFactory::getRouteRule(uint priority, uint look
 {
     std::lock_guard<std::mutex> route_rules_mutex_lock(this->route_rules_mutex);
     std::shared_ptr<RouteRule> result;
-    auto find_function = [priority, lookup](auto elem){
+    auto find_function = [priority, lookup](std::weak_ptr<RouteRule> elem){
          auto element = elem.lock();
         return element->getPriority() == priority && element->getLookup() == lookup;
     };
@@ -146,7 +159,7 @@ std::shared_ptr<IPSet> NetworkFactory::getIPSet(std::string name, std::string ty
 {
     std::lock_guard<std::mutex> ipsets_mutex_lock(this->ipsets_mutex);
     std::shared_ptr<IPSet> result;
-    auto find_function = [name](auto elem){
+    auto find_function = [name](std::weak_ptr<IPSet> elem){
         auto element = elem.lock();
         return element->getName() == name;
     };
@@ -163,7 +176,7 @@ template<typename T, typename Array_t, typename ...Args>
 std::shared_ptr<T> NetworkFactory::getWeakElement(Array_t array, std::function<bool (std::weak_ptr<T> elem)> find_function, Args... args)
 {
     std::shared_ptr<T> result;
-    std::remove_if(array.begin(),array.end(), [](auto elem){
+    std::remove_if(array.begin(),array.end(), [](std::weak_ptr<T> elem){
         return elem.expired();
     });
 

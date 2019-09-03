@@ -23,13 +23,7 @@ std::map<std::string,std::string> getPluginConfiguration(INIReader& reader, std:
     {
 
         std::string interfaces_string(reader.Get(plugin_type, "interfaces", ""));
-        std::vector<std::string> interfaces;
-        std::stringstream ss(interfaces_string);
-        std::string item;
-        while (std::getline(ss, item, ',')) 
-        {
-            interfaces.push_back(item);
-        }
+        configuration["interfaces"] = interfaces_string;
     }
     else if("routing_specializer" == plugin_type)
     {

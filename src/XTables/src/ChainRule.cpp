@@ -19,7 +19,7 @@ XTables::ChainRule::~ChainRule()
 {
     DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::regex exp("-c [[:digit:]]+ [[:digit:]]+");
-    std::string res_rule = std::regex_replace( this->rule, exp, "" );
+    std::string res_rule = std::regex_replace( this->rule, exp, std::string("") );
     std::string rule_cmd = "iptables -t " + this->table_name + " -D " + this->chain_name + " " + res_rule;
     if( 0 != System::call(rule_cmd))
     {

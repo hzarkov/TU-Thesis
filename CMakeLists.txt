@@ -1,6 +1,9 @@
 project("TU-Thesis")
 cmake_minimum_required(VERSION 3.14)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(FLASH_DIR ${PROJECT_BINARY_DIR}/flash)
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -11,7 +14,7 @@ endif(NOT DEFINED INSTALL_PATH)
 
 set(CMAKE_INSTALL_RPATH ${INSTALL_PATH}/lib)
 
-install(FILES nm.service DESTINATION ${INSTALL_PATH}/etc/systemd/system/)
-install(PROGRAMS start.sh DESTINATION ${INSTALL_PATH}/)
+install(FILES nm.service DESTINATION ${FLASH_DIR}/etc/systemd/system/)
+install(PROGRAMS start.sh DESTINATION ${FLASH_DIR}/)
 
 add_subdirectory(src)

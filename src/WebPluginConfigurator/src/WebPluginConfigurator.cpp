@@ -147,9 +147,13 @@ WebPluginConfigurator::Request WebPluginConfigurator::readRequest(int client_soc
     size_t header_end;
     do
     {
-        char buffer[255] = {0};
-        read( client_socket , buffer, 255);
-        request += std::string(buffer);
+        char buffer[255];
+        int read_elems = read( client_socket , buffer, 255); 
+        if(0 < read_elems)
+        {
+            buffer[read_elems] = '\0';
+            request += std::string(buffer);
+        }
     }while(std::string::npos == (header_end = request.find("\r\n\r\n")));
 
     //Parse Header
@@ -171,9 +175,13 @@ WebPluginConfigurator::Request WebPluginConfigurator::readRequest(int client_soc
             int content_to_read = content_length - request.length();
             if( 0 < content_to_read )
             {
-                char buffer[content_to_read] = {0};
-                read( client_socket , buffer, content_to_read);
-                request += std::string(buffer);
+                char buffer[content_to_read];
+                int read_elems = read( client_socket , buffer, content_to_read);
+                if(0 < read_elems)
+                {
+                    buffer[read_elems] = '\0';
+                    request += std::string(buffer);
+                }
             }
             else
             {
@@ -226,13 +234,7 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
     std::string html_string((std::istreambuf_iterator<char>(html_file)), std::istreambuf_iterator<char>());
 
     html_string = std::regex_replace(html_string, std::regex("\\$CSS"), css_string);
-/*    std::string result = "<html> \
-    <head> \
-        <style>\
-            " + cssFile + "\
-        </style>\
-    </head> \
-    <body>";*/
+
     std::string menu = "<ul class=\"center\">";
     for(auto plugin: this->plugins)
     {
@@ -264,11 +266,10 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
     }
     catch(std::out_of_range& e)
     {
-
+        DebugLogger << e.what() << std::endl;
     }
     html_string = std::regex_replace(html_string, std::regex("\\$CONFIGURATION"), configuration);
     
-    //result += "\t</body>\n</html>";
     return html_string;
 }
 
@@ -277,14 +278,7 @@ std::string WebPluginConfigurator::processRequest(int client_socket, WebPluginCo
     DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::string type = request.header["Type"];
     std::string request_type = type.substr(0,type.find(' '));
-    
-    if("GET" == request_type)
-    {
-        /*std::ifstream t("index.html");
-        std::string indexHTML((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-        this->sendMessage(client_socket, indexHTML);*/
-    }
-    else if("POST" == request_type)
+    if("POST" == request_type)
     {
         int plugin_id;
         try
@@ -299,7 +293,6 @@ std::string WebPluginConfigurator::processRequest(int client_socket, WebPluginCo
         catch(std::invalid_argument& e)
         {
             ErrorLogger << "Incorrect plugin id string. Someone is doing something nasty!" << std::endl;
-            //this->sendMessage(client_socket, "<p>" + e.what() + "<p>")
         }
         catch(std::out_of_range& e)
         {

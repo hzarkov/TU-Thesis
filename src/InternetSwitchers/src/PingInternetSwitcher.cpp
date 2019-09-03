@@ -19,10 +19,8 @@ void PingInternetSwitcher::configure(Plugin::Configuration_t conf)
     {
         try
         {
-            {
-                std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
-                this->interfaces.push_back(interface_name);
-            }
+            std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
+            this->interfaces.push_back(interface_name);
         }
         catch(std::exception& e)
         {
@@ -65,19 +63,40 @@ void PingInternetSwitcher::Run()
         } 
         for(auto interface_name: interfaces_copy)
         {
-            try
+            if(interface_name != this->current_interface)
             {
-                std::shared_ptr<InterfaceController> interface = this->network_manager->getInterface(interface_name);
-                std::shared_ptr<Route> route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
-                if(0 == System::call("ping -c " + PING_ADDRESS))
+                try
                 {
-                    default_gw = this->network_manager->addRoute("0.0.0.0/0", interface->getGW());
-                    break;
+                    std::shared_ptr<InterfaceController> interface = this->network_manager->getInterface(interface_name);
+                    std::shared_ptr<Route> route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
+                    if(0 == System::call("ping -c 1 " + PING_ADDRESS + " > /dev/null"))
+                    {
+                        try
+                        {
+                            default_gw = this->network_manager->addRoute("0.0.0.0/0", interface->getGW());
+                            this->current_interface = interface_name;
+                            this->masquarade_chain = this->network_manager->getXTable("nat")->getChain("POSTROUTING");
+                            this->masquarade_chain->addRule("--out-interface " + interface_name + " -j MASQUERADE");
+                            std::vector<DNSMasqConfiguration::Configuration_t> resolv_conf;
+                            for(std::string dns_server : interface->getDNSServers())
+                            {
+                                auto pair = std::make_pair("server", dns_server);
+                                resolv_conf.push_back(pair);
+                            }
+                            this->dns_configaration = this->network_manager->getDNSMasqController()->addConfiguration("resolvconf", resolv_conf);
+                            this->network_manager->getDNSMasqController()->reloadConfiguration();
+                        }
+                        catch(std::exception& e)
+                        {
+                            ErrorLogger << "Failed to setup interface('" << interface_name << "') because of ' " << e.what() << "' error." << std::endl;
+                        }
+                        break;
+                    }
                 }
-            }
-            catch(std::exception& e)
-            {
-                WarningLogger << "Failed to check internet connection of " << interface_name << ": " << e.what() << std::endl;
+                catch(std::exception& e)
+                {
+                    WarningLogger << "Failed to check internet connection of " << interface_name << ": " << e.what() << std::endl;
+                }
             }
         }
         std::unique_lock<std::mutex> lk(this->thread_block_mutex);

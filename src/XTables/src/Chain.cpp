@@ -19,7 +19,7 @@ XTables::Chain::RuleID XTables::Chain::addRule(std::string rule, std::string typ
     DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::lock_guard<std::mutex> package_rules_mutex_lock(this->package_rules_mutex);
     static XTables::Chain::RuleID rule_id = 0;
-    this->package_rules[rule_id] = std::make_unique<ChainRule>(this->table_name, this->name, rule, type);
+    this->package_rules[rule_id] = std::make_shared<ChainRule>(this->table_name, this->name, rule, type);
     return rule_id++;
 }
 

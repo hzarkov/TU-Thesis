@@ -10,7 +10,8 @@ public:
     virtual ~InterfaceController() = default;
     std::string getGW();
     std::string getName();
+    std::vector<std::string> getDNSServers();
 protected:
-    std::unique_ptr<Interface> interface;
+    std::shared_ptr<Interface> interface;
 };
 #endif

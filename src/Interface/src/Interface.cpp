@@ -80,6 +80,11 @@ IP Interface::getGW()
     return this->gateway;
 }
 
+std::vector<IP> Interface::getDNSServers()
+{
+    return this->dns_servers;
+}
+
 int Interface::registerGatewayCallback(std::function<void(IP gateway)> callback)
 {
     return this->registerCallback(this->gateway_change_callback, callback);

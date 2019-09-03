@@ -31,3 +31,34 @@ Features:
 		Output data that failed and send when internet connection is back. Do not report bad internet connection to the user.
 	- USB Printer support
 		
+
+
+Build Procedure
+	
+	mkdir build
+
+	cd build
+
+	cmake -D CMAKE_TOOLCHAIN_FILE=../Toolchain-RaspberryPi.cmake -D INSTALL_PATH=/app/ ..
+
+	make install
+
+	cd flash
+
+	tar -czvf nm.tar.gz *
+
+	scp nm.tar.gz pi@192.168.0.210:~/
+
+	ssh pi@192.168.0.210 
+
+	sudo su 
+	
+	cd /
+
+	tar -xzvf /home/pi/nm.tar.gz 
+
+	cp -r /app/etc /
+
+	systemctl enable nm 
+
+	systemctl start nm

@@ -27,7 +27,10 @@ private:
     std::condition_variable thread_block;
     std::mutex thread_block_mutex;
 
+    std::shared_ptr<XTables::Chain> masquarade_chain;
     std::vector<std::string> interfaces;
     std::mutex interfaces_mutex;
+    std::string current_interface;
+    std::shared_ptr<DNSMasqConfiguration> dns_configaration;
 };
 #endif
