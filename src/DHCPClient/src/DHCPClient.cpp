@@ -5,7 +5,7 @@ void DHCPClient::run()
 {
     while(this->running)
     {
-        std::string dhcp_result = System::exec("./dhcpclient -T " + this->interface); //ToDo: Add graceful termination for dhcpclient because now it it's blocked it would never end.
+        std::string dhcp_result = System::exec("./dhcpresolver -T " + this->interface); //ToDo: Add graceful termination for dhcpclient because now it it's blocked it would never end.
         std::stringstream lineStream(dhcp_result);
         std::getline(lineStream, this->dhcp_server, ',');
         std::getline(lineStream, this->ip, ',');

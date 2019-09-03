@@ -1,5 +1,5 @@
 add_library(ethernet_interface_controller SHARED EthernetController.cpp InterfaceController.cpp)
-target_link_libraries(ethernet_interface_controller PUBLIC interface dhcp_client dhcp_server)
+target_link_libraries(ethernet_interface_controller PUBLIC interface dhcp_client dhcp_server logger)
 target_include_directories(ethernet_interface_controller PUBLIC ../include/)
 
 

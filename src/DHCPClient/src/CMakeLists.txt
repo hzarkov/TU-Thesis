@@ -9,8 +9,8 @@ add_custom_target(
    dhcpclient
    DEPENDS ${DHCPCLIENT_DIR}
 )
-install(FILES ${DHCPCLIENT_DIR}/dhcpclient DESTINATION ${PROJECT_BINARY_DIR}/output/bin/
-    PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ GROUP_WRITE WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+
+add_subdirectory(dhcpclient-snap_20071104)
 
 add_library(dhcp_client DHCPClient.cpp)
 target_link_libraries(dhcp_client PRIVATE system)
