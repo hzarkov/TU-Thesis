@@ -6,21 +6,24 @@ void DHCPClient::run()
     while(this->running)
     {
         std::string dhcp_result = System::exec("./dhcpresolver -T " + this->interface); //ToDo: Add graceful termination for dhcpclient because now it it's blocked it would never end.
-        std::stringstream lineStream(dhcp_result);
-        std::getline(lineStream, this->dhcp_server, ',');
-        std::getline(lineStream, this->ip, ',');
-        std::getline(lineStream, this->mask, ',');
-        std::getline(lineStream, this->broadcast, ',');
-        std::getline(lineStream, this->gateway, ',');
-        std::string lease_string;
-        std::getline(lineStream, lease_string, ',');
-        this->lease = std::stoi(lease_string);
-        std::string dns_server;
-        while(std::getline(lineStream, dns_server, ','))
+        if(!dhcp_result.empty())
         {
-            this->dns_servers.push_back(dns_server);
+            std::stringstream lineStream(dhcp_result);
+            std::getline(lineStream, this->dhcp_server, ',');
+            std::getline(lineStream, this->ip, ',');
+            std::getline(lineStream, this->mask, ',');
+            std::getline(lineStream, this->broadcast, ',');
+            std::getline(lineStream, this->gateway, ',');
+            std::string lease_string;
+            std::getline(lineStream, lease_string, ',');
+            this->lease = std::stoi(lease_string);
+            std::string dns_server;
+            while(std::getline(lineStream, dns_server, ','))
+            {
+                this->dns_servers.push_back(dns_server);
+            }
+            this->callback(this->ip, this->mask, this->gateway, this->dns_servers);
         }
-        this->callback(this->ip, this->mask, this->gateway, this->dns_servers);
         if(this->running)
         {
             std::unique_lock<std::mutex> lk(this->thread_timer_mutex);

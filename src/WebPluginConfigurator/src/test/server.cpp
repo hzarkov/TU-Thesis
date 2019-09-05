@@ -1,41 +1,21 @@
-#include "WebPluginConfigurator.hpp"
-
-#include <signal.h>
 #include <iostream>
+#include <regex>
+#include <fstream>
 int main()
 {
-    // Block stop signals.
-    sigset_t sigSet;
-    int sigStop;
-    (void)sigemptyset(&sigSet);
-    (void)sigaddset(&sigSet, SIGINT);
-    (void)sigaddset(&sigSet, SIGTERM);
+    std::ifstream css_file("config/UI/design.css");
+    std::string css_string((std::istreambuf_iterator<char>(css_file)), std::istreambuf_iterator<char>());
 
-    if (0 != pthread_sigmask(SIG_BLOCK, &sigSet, NULL))
-    {
-        std::cout << "Failed to block stop signals." << std::endl;
-        return EXIT_FAILURE;
-    }
+    std::ifstream html_file("config/UI/index.html");
+    std::string html_string((std::istreambuf_iterator<char>(html_file)), std::istreambuf_iterator<char>());
+    //std::string text("Hello World $CSS hfuweregepge gew");
+    //std::regex e("\\$CSS");
+    //std::string replace_with("WORLD !\nfrwfrve\n#1\.divvv\n");
+    std::string hello = "hello World $asd";
+    std::cout << "Content: " << hello << std::endl;
+    hello = std::regex_replace(hello, std::regex("\\$asd"), std::string("hi")); 
+    std::cout << "Hello: " << hello << std::endl;
 
-    WebPluginConfigurator wpc;
-    wpc.start();
-
-    // Wait for stop signal (SIGINT, SIGTERM).
-    if (0 != sigwait(&sigSet, &sigStop))
-    {
-        std::cout << "Failed to wait stop signal." << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    switch (sigStop)
-    {
-        case SIGINT:
-        case SIGTERM:
-            //wpc.stop();
-            break;
-        default:
-            std::cout << "Caught unexpected stop signal." << std::endl;
-            return EXIT_FAILURE;
-    }
-
+    return 0;
 }
+

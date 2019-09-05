@@ -19,10 +19,22 @@ void RoutingSpecializer::configure(Plugin::Configuration_t conf)
         }
         catch(std::exception& e)
         {
-            traffic_specialization = std::make_shared<TrafficSpecialization>(this->network_manager, interface_name);
-            this->traffic_specializations[interface_name] = traffic_specialization;
+            traffic_specialization = nullptr;
         }
-
+        if(nullptr == traffic_specialization)
+        {
+            try
+            {
+                traffic_specialization = std::make_shared<TrafficSpecialization>(this->network_manager, interface_name);
+                this->traffic_specializations[interface_name] = traffic_specialization;
+            }
+            catch(std::exception& e)
+            {
+                WarningLogger << "Failed to add interface_name configuration. " << e.what() << std::endl;
+                this->traffic_specializations[interface_name] = traffic_specialization;
+                continue;
+            }
+        }
         std::stringstream ss(configuration.second);
         std::string destination;
         while (std::getline(ss, destination, ',')) 
@@ -56,9 +68,12 @@ Plugin::Configuration_t RoutingSpecializer::getConfiguration()
     for(auto traffic_specialization : this->traffic_specializations)
     {
         result[traffic_specialization.first] = "";
-        for(auto ip : traffic_specialization.second->getIPs())
+        if(nullptr != traffic_specialization.second)
         {
-            result[traffic_specialization.first] += ip + ",";
+            for(auto ip : traffic_specialization.second->getIPs())
+            {
+                result[traffic_specialization.first] += ip + ",";
+            }
         }
     }
     return result;

@@ -148,7 +148,7 @@ WebPluginConfigurator::Request WebPluginConfigurator::readRequest(int client_soc
     do
     {
         char buffer[255];
-        int read_elems = read( client_socket , buffer, 255); 
+        int read_elems = read(client_socket , buffer, 255); 
         if(0 < read_elems)
         {
             buffer[read_elems] = '\0';
@@ -229,12 +229,12 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
 
     std::ifstream css_file(CSS_FILE);
     std::string css_string((std::istreambuf_iterator<char>(css_file)), std::istreambuf_iterator<char>());
+    css_file.close();
 
     std::ifstream html_file(HTML_FILE);
     std::string html_string((std::istreambuf_iterator<char>(html_file)), std::istreambuf_iterator<char>());
-
+    html_file.close();
     html_string = std::regex_replace(html_string, std::regex("\\$CSS"), css_string);
-
     std::string menu = "<ul class=\"center\">";
     for(auto plugin: this->plugins)
     {
@@ -269,7 +269,6 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
         DebugLogger << e.what() << std::endl;
     }
     html_string = std::regex_replace(html_string, std::regex("\\$CONFIGURATION"), configuration);
-    
     return html_string;
 }
 

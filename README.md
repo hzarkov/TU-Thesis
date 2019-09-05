@@ -55,10 +55,15 @@ Build Procedure
 	
 	cd /
 
-	tar -xzvf /home/pi/nm.tar.gz 
+	mkdir /app
+	
+	tar -xzvf /home/pi/nm.tar.gz -C /app
 
 	cp -r /app/etc /
 
 	systemctl enable nm 
 
 	systemctl start nm
+
+
+	 cd .. && make install -j12 && cd flash && rm -rf nm.tar.gz && tar -czvf nm.tar.gz * && scp nm.tar.gz pi@192.168.0.210:~/

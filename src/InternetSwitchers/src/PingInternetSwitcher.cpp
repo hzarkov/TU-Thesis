@@ -60,7 +60,7 @@ void PingInternetSwitcher::Run()
         {
             std::lock_guard<std::mutex> interfaces_mutex_lock(this->interfaces_mutex);
             interfaces_copy = this->interfaces;     
-        } 
+        }
         for(auto interface_name: interfaces_copy)
         {
             if(interface_name != this->current_interface)
@@ -68,11 +68,12 @@ void PingInternetSwitcher::Run()
                 try
                 {
                     std::shared_ptr<InterfaceController> interface = this->network_manager->getInterface(interface_name);
-                    std::shared_ptr<Route> route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
+                    std::shared_ptr<Route> ping_route = this->network_manager->addRoute(PING_ADDRESS + "/32", interface->getGW());
                     if(0 == System::call("ping -c 1 " + PING_ADDRESS + " > /dev/null"))
                     {
                         try
                         {
+                            default_gw = nullptr;
                             default_gw = this->network_manager->addRoute("0.0.0.0/0", interface->getGW());
                             this->current_interface = interface_name;
                             this->masquarade_chain = this->network_manager->getXTable("nat")->getChain("POSTROUTING");
