@@ -13,9 +13,12 @@ private:
     std::thread thread;
     std::mutex running_mutex;
     bool running;
-    std::condition_variable thread_timer_cond;
     std::mutex thread_timer_mutex;
+    std::condition_variable thread_timer_cond;
     std::function<void (std::string, std::string, std::string, std::vector<std::string>)> callback;
+
+    std::mutex trigger_cond_mutex;
+    std::condition_variable trigger_cond;
 
     std::string interface;
     std::string dhcp_server;

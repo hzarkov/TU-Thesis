@@ -1,6 +1,7 @@
 #include "WebPluginConfigurator.hpp"
 
 #include "Logger.hpp"
+#include "ElapsedTime.hpp"
 
 #include <sys/socket.h>
 #include <unistd.h>
@@ -18,7 +19,6 @@ const std::string HTML_FILE = "../config/UI/index.html";
 
 WebPluginConfigurator::WebPluginConfigurator()
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     DebugLogger << "Creating socket" << std::endl;
     if ((this->server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -52,14 +52,12 @@ WebPluginConfigurator::WebPluginConfigurator()
 
 void WebPluginConfigurator::start()
 {    
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     this->accept_new_clients = true;
     this->accept_clients_thread = std::thread(&WebPluginConfigurator::AccpetingThread, this);
 }
 
 void WebPluginConfigurator::stop()
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     //might need to add mutex to combine both functions
     //this->accept_new_clients = false;
     //this->accept_clients_thread.join();
@@ -67,7 +65,6 @@ void WebPluginConfigurator::stop()
 
 void WebPluginConfigurator::AccpetingThread()
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     DebugLogger << "Started Accepting Thread" << std::endl;
     while(true == accept_new_clients)
     {
@@ -86,7 +83,6 @@ void WebPluginConfigurator::AccpetingThread()
 
 WebPluginConfigurator::Header_t WebPluginConfigurator::parseHeader(std::string& request)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     WebPluginConfigurator::Header_t result;
     std::stringstream ss(request);
     std::string row;
@@ -117,7 +113,6 @@ WebPluginConfigurator::Header_t WebPluginConfigurator::parseHeader(std::string& 
 
 WebPluginConfigurator::Data_t WebPluginConfigurator::parseData(std::string& request)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     WebPluginConfigurator::Data_t result;
     std::stringstream ss(request);
     std::string row;
@@ -140,7 +135,6 @@ WebPluginConfigurator::Data_t WebPluginConfigurator::parseData(std::string& requ
 }
 WebPluginConfigurator::Request WebPluginConfigurator::readRequest(int client_socket)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     WebPluginConfigurator::Request result;
     std::string request = "";
     //Read Header
@@ -203,7 +197,6 @@ WebPluginConfigurator::Request WebPluginConfigurator::readRequest(int client_soc
 
 void WebPluginConfigurator::sendMessage(int client_socket, std::string content_type, std::string& message)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::string string_message = "\r\nHTTP/1.1 \r\nContent-Type:" + content_type + "; \r\n\r\n" + message + "\r\n\r\n";
     const char* c_message = string_message.c_str();
     write(client_socket , c_message, strlen(c_message));
@@ -211,7 +204,6 @@ void WebPluginConfigurator::sendMessage(int client_socket, std::string content_t
 
 size_t WebPluginConfigurator::getPluginIdOfRequest(WebPluginConfigurator::Request& request)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::string type = request.header["Type"];
     size_t plugin_field_pos = type.find("plugin=");
     if(std::string::npos != plugin_field_pos)
@@ -225,8 +217,10 @@ size_t WebPluginConfigurator::getPluginIdOfRequest(WebPluginConfigurator::Reques
 
 std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Request& request)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
 
+    //ElapsedTime response_generation_time;
+    //InformationLogger << "Generating response message" << std::endl;
+    //response_generation_time.start();
     std::ifstream css_file(CSS_FILE);
     std::string css_string((std::istreambuf_iterator<char>(css_file)), std::istreambuf_iterator<char>());
     css_file.close();
@@ -269,16 +263,19 @@ std::string WebPluginConfigurator::generateHTMLMessage(WebPluginConfigurator::Re
         DebugLogger << e.what() << std::endl;
     }
     html_string = std::regex_replace(html_string, std::regex("\\$CONFIGURATION"), configuration);
+    //InformationLogger << "Message was generated, time= " << response_generation_time.ready() << std::endl; 
     return html_string;
 }
 
 std::string WebPluginConfigurator::processRequest(int client_socket, WebPluginConfigurator::Request& request)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::string type = request.header["Type"];
     std::string request_type = type.substr(0,type.find(' '));
     if("POST" == request_type)
     {
+        //ElapsedTime configuration_time;
+        //InformationLogger << "Starting plugin configuration." << std::endl;
+        //configuration_time.start();
         int plugin_id;
         try
         {
@@ -301,25 +298,33 @@ std::string WebPluginConfigurator::processRequest(int client_socket, WebPluginCo
         {
             ErrorLogger << "Failed to configure plugin " << plugin_id << " because of '" << e.what() << "'." << std::endl;
         }
+        //InformationLogger << "Plugin was configured, time= " << configuration_time.ready() << std::endl;
     }
     return this->generateHTMLMessage(request);
 }
 
 void WebPluginConfigurator::ClientThread(int client_socket)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
-    DebugLogger << "Reading client request." << std::endl;
+    //ElapsedTime client_time, processing;
+    //InformationLogger << "Starting client request processing" << std::endl;
+    //client_time.start();
+    //InformationLogger << "Reading client request." << std::endl;
+    //processing.start();
     WebPluginConfigurator::Request request = this->readRequest(client_socket);
+    //InformationLogger << "Request was read, time= " << processing.ready() << std::endl;
 
+    //InformationLogger << "Processing Request." << std::endl;
+    //processing.start();
     std::string response = this->processRequest(client_socket, request);
+    //InformationLogger << "Request was processed, time= " << processing.ready() << std::endl;
 
     this->sendMessage(client_socket, "text/html", response);
     close(client_socket);
+    //InformationLogger << "Client was processes, time= " << client_time.ready() << std::endl;
 }
 
 WebPluginConfigurator::~WebPluginConfigurator()
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
 
     close(this->server_socket);
     //might need to add mutex to combine both functions

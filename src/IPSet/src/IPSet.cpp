@@ -2,6 +2,7 @@
 #include "System.hpp"
 
 #include <stdexcept>
+#include <algorithm>
 
 IPSet::IPSet(std::string name, std::string type)
 :name(name)
@@ -21,12 +22,25 @@ std::string IPSet::getName()
 
 void IPSet::addIP(std::string ip)
 {
-    std::string cmd = "ipset add " + this->name + " " + ip;
-    if (0 != System::call(cmd))
+    if(this->ips.end() == std::find(this->ips.begin(), this->ips.end(), ip))
     {
-        throw std::runtime_error("Failed to add '" + ip + "' to '" + this->name + "' ipset using: " + cmd);
+        std::string cmd = "ipset add " + this->name + " " + ip;
+        if (0 != System::call(cmd))
+        {
+            throw std::runtime_error("Failed to add '" + ip + "' to '" + this->name + "' ipset using: " + cmd);
+        }
+        this->ips.push_back(ip);
     }
-    ips.push_back(ip);
+}
+
+void IPSet::clearIPs()
+{
+    std::string cmd = "ipset flush " + this->name;
+    if( 0 != System::call(cmd))
+    {
+        throw std::runtime_error("Failed to clear " + this->name);
+    }
+    this->ips.clear();
 }
 
 std::vector<std::string> IPSet::getIPs()

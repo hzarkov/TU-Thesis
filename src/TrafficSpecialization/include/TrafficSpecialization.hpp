@@ -13,6 +13,7 @@ public:
     void addDomain(std::string domain_name);
     std::vector<std::string> getIPs();
     std::vector<std::string> getDomains();
+    void clearIPs();
     ~TrafficSpecialization() = default;
 private:
     std::shared_ptr<RouteRule> route_rule;

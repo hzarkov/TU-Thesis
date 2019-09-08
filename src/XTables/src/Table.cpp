@@ -8,12 +8,10 @@ const std::vector<std::string> main_chains = {"OUTPUT","FORWARD","INPUT","PREROU
 XTables::Table::Table(std::string name)
 :name(name)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
 }
 
 std::shared_ptr<XTables::Chain> XTables::Table::getChain(std::string chain_name)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     std::shared_ptr<XTables::Chain> result;
     try
     {

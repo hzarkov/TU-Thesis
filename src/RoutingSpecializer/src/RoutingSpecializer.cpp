@@ -9,6 +9,7 @@ RoutingSpecializer::RoutingSpecializer(std::shared_ptr<NetworkFactory> nm)
 
 void RoutingSpecializer::configure(Plugin::Configuration_t conf)
 {
+    std::map<std::string, std::shared_ptr<TrafficSpecialization>> traffic_specializations_result;
     for(auto configuration : conf)
     {
         std::string interface_name = configuration.first;
@@ -26,17 +27,21 @@ void RoutingSpecializer::configure(Plugin::Configuration_t conf)
             try
             {
                 traffic_specialization = std::make_shared<TrafficSpecialization>(this->network_manager, interface_name);
-                this->traffic_specializations[interface_name] = traffic_specialization;
             }
             catch(std::exception& e)
             {
                 WarningLogger << "Failed to add interface_name configuration. " << e.what() << std::endl;
-                this->traffic_specializations[interface_name] = traffic_specialization;
-                continue;
+                traffic_specialization = nullptr;
             }
+        }
+        traffic_specializations_result[interface_name] = traffic_specialization;
+        if(nullptr == traffic_specialization)
+        {
+            continue;
         }
         std::stringstream ss(configuration.second);
         std::string destination;
+        traffic_specialization->clearIPs();
         while (std::getline(ss, destination, ',')) 
         {
             if(1) //ToDo: Check if destination is IP or domain
@@ -59,7 +64,8 @@ void RoutingSpecializer::configure(Plugin::Configuration_t conf)
                  WarningLogger << "Unknown domain type of '" + destination << "'" << std::endl;
             } 
         }
-    }   
+    }
+    this->traffic_specializations = traffic_specializations_result;
 }
 
 Plugin::Configuration_t RoutingSpecializer::getConfiguration()

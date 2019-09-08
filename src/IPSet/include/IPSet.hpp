@@ -10,6 +10,7 @@ public:
     std::string getName();
     void addIP(std::string ip);
     std::vector<std::string> getIPs();
+    void clearIPs();
     ~IPSet();
 private:
     std::string name;

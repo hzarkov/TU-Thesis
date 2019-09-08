@@ -8,7 +8,6 @@
 XTables::ChainRule::ChainRule(std::string table_name, std::string chain_name, std::string rule, std::string type)
 :rule(rule), table_name(table_name), chain_name(chain_name)
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     if(0 != System::call("iptables -t " + table_name + " " + type + " " + chain_name + " " + rule))
     {
         throw std::runtime_error("Failed to execute '" + rule + "'.");
@@ -17,7 +16,6 @@ XTables::ChainRule::ChainRule(std::string table_name, std::string chain_name, st
 
 XTables::ChainRule::~ChainRule()
 {
-    DebugLogger << __PRETTY_FUNCTION__ << std::endl;
     try
     {
         std::regex exp("-c [[:digit:]]+ [[:digit:]]+");

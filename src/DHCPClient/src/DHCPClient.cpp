@@ -24,6 +24,7 @@ void DHCPClient::run()
             }
             this->callback(this->ip, this->mask, this->gateway, this->dns_servers);
         }
+        this->trigger_cond.notify_all();
         if(this->running)
         {
             std::unique_lock<std::mutex> lk(this->thread_timer_mutex);
@@ -46,6 +47,8 @@ DHCPClient::~DHCPClient()
 void DHCPClient::triggerIPCheck()
 {
     this->thread_timer_cond.notify_all();
+    std::unique_lock<std::mutex> lk(this->trigger_cond_mutex);
+    this->trigger_cond.wait_for(lk,std::chrono::seconds(2));
 }
 
 void DHCPClient::start()
@@ -55,6 +58,8 @@ void DHCPClient::start()
     {
         this->running = true;
         this->thread = std::thread(&DHCPClient::run,this);
+        std::unique_lock<std::mutex> lk(this->trigger_cond_mutex);
+        this->trigger_cond.wait_for(lk,std::chrono::seconds(2));
     }
 }
 

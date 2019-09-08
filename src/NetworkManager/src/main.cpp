@@ -4,6 +4,7 @@
 #include "DLoader.hpp"
 #include "Plugin.hpp"
 #include "WebPluginConfigurator.hpp"
+#include "ElapsedTime.hpp"
 
 #include <memory>
 #include <signal.h>
@@ -42,6 +43,9 @@ std::map<std::string,std::string> getPluginConfiguration(INIReader& reader, std:
 
 int main(int argc, char const *argv[])
 {
+    //InformationLogger << "Initializing..." << std::endl;
+    //ElapsedTime init, others;
+    //init.start();
     // Block stop signals.
     sigset_t sigSet;
     int sigStop;
@@ -55,9 +59,12 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
+    //InformationLogger << "Starting Network Factory..." << std::endl;
+    //others.start();
     std::shared_ptr<NetworkFactory> network_factory = 
         std::make_shared<NetworkFactory>();
     network_factory->start();
+    //InformationLogger << "Network Factory started, time= " << others.ready() << std::endl;
 
     INIReader reader(NM_PLUGIN_CONFIGURATION_FILE);
 
@@ -67,12 +74,14 @@ int main(int argc, char const *argv[])
     std::set<std::string> sections = reader.Sections();
     std::map<std::string,std::shared_ptr<DLoader>> loaded_plugins;
     //std::vector<std::shared_ptr<Plugin>> plugin_instances;
+    //others.start();
     std::shared_ptr<PluginConfigurator> plugin_configurator = std::make_shared<WebPluginConfigurator>();
 
     for (std::set<std::string>::iterator it = sections.begin(); it != sections.end(); ++it)
     {
         std::string plugin_type = *it;
         InformationLogger << "Loading " << plugin_type << "..." << std::endl;
+        //others.start();
 
         std::shared_ptr<DLoader> plugin_dl;
         try
@@ -105,8 +114,13 @@ int main(int argc, char const *argv[])
         {
             ErrorLogger << "Failed to add " << plugin_type << " plug-in because of '" << e.what() << "'" << std::endl;
         }
+        //InformationLogger << plugin_type << " loaded, time= " << others.ready() << std::endl;
     }
+    //InformationLogger << "Plugin Configurator starting..." << std::endl;
     plugin_configurator->start();
+    //InformationLogger << "Plugin Configurator starting, time= " << others.ready() << std::endl;
+
+    //InformationLogger << "Initialized, time = " << init.ready() << std::endl;
     // Wait for stop signal (SIGINT, SIGTERM).
     if (0 != sigwait(&sigSet, &sigStop))
     {

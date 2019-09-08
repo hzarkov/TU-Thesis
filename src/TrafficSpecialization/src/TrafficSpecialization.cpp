@@ -40,6 +40,11 @@ void TrafficSpecialization::addDomain(std::string domain_name)
 
 }
 
+void TrafficSpecialization::clearIPs()
+{
+    this->ipset->clearIPs();
+}
+
 std::vector<std::string> TrafficSpecialization::getIPs()
 {
     return this->ipset->getIPs();
